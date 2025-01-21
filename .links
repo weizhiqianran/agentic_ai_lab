@@ -1,5 +1,13 @@
 
 
-Tool Schema Definitions in LangChain
-https://www.kaggle.com/code/ksmooi/tool-schema-definitions-in-langchain
+## Tool
+
+- Tool Schema Definitions in LangChain
+  https://www.kaggle.com/code/ksmooi/tool-schema-definitions-in-langchain
+
+### Built-in Tools
+
+- LangChain Built-in Tool: DuckDuckGo (Web Search)
+  https://www.kaggle.com/code/ksmooi/langchain-built-in-tool-duckduckgo-web-search
+
 
