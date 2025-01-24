@@ -16,8 +16,19 @@
 
 ## Tool
 
-- Tool Schema Definitions in LangChain
-  https://www.kaggle.com/code/ksmooi/tool-schema-definitions-in-langchain
+- LangChain: The Definitions of Tool Schema
+  https://www.kaggle.com/code/ksmooi/langchain-the-definitions-of-tool-schema
+
+- LangChain: StructuredTool Comprehensive Guide
+  https://www.kaggle.com/code/ksmooi/langchain-structuredtool-comprehensive-guide
+
+- LangChain: Structured Outputs from LLM
+  https://www.kaggle.com/code/ksmooi/langchain-structured-outputs-from-llm
+
+- LangChain: Building Conversational AI Tools
+  https://www.kaggle.com/code/ksmooi/langchain-building-conversational-ai-tools
+
+
 
 ### Built-in Tools
 
