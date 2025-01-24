@@ -7,6 +7,12 @@
 - LangChain: Mastering Text Splitting
   https://www.kaggle.com/code/ksmooi/langchain-mastering-text-splitting
 
+## Agentic RAG
+
+- LangGraph: Self RAG with Chroma
+  https://www.kaggle.com/code/ksmooi/langgraph-self-rag-with-chroma
+
+
 
 ## Tool
 
@@ -28,6 +34,15 @@
 
 - LangChain Tool-Integrated with ReAct Agent
   https://www.kaggle.com/code/ksmooi/langchain-tool-integrated-with-react-agent
+
+- LangGraph: From Planning to Execution
+  https://www.kaggle.com/code/ksmooi/langgraph-from-planning-to-execution
+
+- LangChain: Pandas DataFrame Agent Guide
+  https://www.kaggle.com/code/ksmooi/langchain-pandas-dataframe-agent-guide
+
+- LangGraph: SQL Query Generation
+  https://www.kaggle.com/code/ksmooi/langgraph-sql-query-generation
 
 
 
