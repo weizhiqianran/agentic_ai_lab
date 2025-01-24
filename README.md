@@ -14,7 +14,7 @@ The tutorial is organized into several comprehensive sections, each focusing on 
 
 ---
 
-### **1. LCEL (LangChain Extended Library)**
+### **1. LCEL (LangChain Expression Language)**
 Delve into the extended functionalities of LangChain with quick reference guides that cover essential components and design patterns.
 
 - **[LangChain: LCEL Quick Reference](https://www.kaggle.com/code/ksmooi/langchain-lcel-quick-reference)**
