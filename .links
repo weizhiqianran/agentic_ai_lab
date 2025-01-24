@@ -1,11 +1,28 @@
 
-## RAG
+## Splitter
 
 - Markdown Extraction for RAG Workflows (MarkItDown)
   https://www.kaggle.com/code/ksmooi/markdown-extraction-for-rag-workflows-markitdown
 
 - LangChain: Mastering Text Splitting
   https://www.kaggle.com/code/ksmooi/langchain-mastering-text-splitting
+
+## Retriever
+
+- LangChain: MultiQueryRetriever Quick Reference
+  https://www.kaggle.com/code/ksmooi/langchain-multiqueryretriever-quick-reference
+
+- LangChain: MultiVectorRetriever Quick Reference
+  https://www.kaggle.com/code/ksmooi/langchain-multivectorretriever-quick-reference
+
+- LangChain: ParentDocumentRetriever Quick Guide
+  https://www.kaggle.com/code/ksmooi/langchain-parentdocumentretriever-quick-guide
+
+- LangChain: SelfQueryRetriever Quick Reference
+  https://www.kaggle.com/code/ksmooi/langchain-selfqueryretriever-quick-reference
+
+- LangChain: EnsembleRetriever Quick Reference
+  https://www.kaggle.com/code/ksmooi/langchain-ensembleretriever-quick-reference
 
 ## Agentic RAG
 
