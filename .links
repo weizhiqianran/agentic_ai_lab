@@ -22,6 +22,7 @@
 - LangChain: Mastering Text Splitting
   https://www.kaggle.com/code/ksmooi/langchain-mastering-text-splitting
 
+
 ### Indexing
 
 - LangChain: Document Indexing Comprehensive Guide
@@ -32,6 +33,7 @@
 
 - LangChain: Chroma Quick Reference (Vector Store)
   https://www.kaggle.com/code/ksmooi/langchain-chroma-quick-reference-vector-store
+
 
 ### Retriever
 
@@ -66,7 +68,6 @@
   https://www.kaggle.com/code/ksmooi/langchain-building-conversational-ai-tools
 
 
-
 ### Built-in Tools
 
 - LangChain: DuckDuckGo Quick Guide (Web Search)
@@ -77,6 +78,7 @@
 
 - LangChain: Data Analysis with REPL-Tool and LLM
   https://www.kaggle.com/code/ksmooi/langchain-data-analysis-with-repl-tool-and-llm
+
 
 ### Agent Workflow
 
@@ -100,6 +102,15 @@
 
 
 ### Agentic RAG
+
+- LangGraph: Adaptive RAG with Chroma
+  https://www.kaggle.com/code/ksmooi/langgraph-adaptive-rag-with-chroma
+
+- LangGraph: Agentic RAG with Chroma
+  https://www.kaggle.com/code/ksmooi/langgraph-agentic-rag-with-chroma
+
+- LangGraph: Corrective RAG with Chroma
+  https://www.kaggle.com/code/ksmooi/langgraph-corrective-rag-with-chroma
 
 - LangGraph: Self RAG with Chroma
   https://www.kaggle.com/code/ksmooi/langgraph-self-rag-with-chroma
