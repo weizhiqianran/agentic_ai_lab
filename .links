@@ -1,5 +1,5 @@
 
-## LCEL
+### LCEL
 
 - LangChain: LCEL Quick Reference
   https://www.kaggle.com/code/ksmooi/langchain-lcel-quick-reference
@@ -14,7 +14,7 @@
   https://www.kaggle.com/code/ksmooi/langchain-prompt-templates-quick-reference
 
 
-## Splitter
+### Splitter
 
 - Markdown Extraction for RAG Workflows (MarkItDown)
   https://www.kaggle.com/code/ksmooi/markdown-extraction-for-rag-workflows-markitdown
@@ -22,7 +22,7 @@
 - LangChain: Mastering Text Splitting
   https://www.kaggle.com/code/ksmooi/langchain-mastering-text-splitting
 
-## Indexing
+### Indexing
 
 - LangChain: Document Indexing Comprehensive Guide
   https://www.kaggle.com/code/ksmooi/langchain-document-indexing-comprehensive-guide
@@ -33,7 +33,7 @@
 - LangChain: Chroma Quick Reference (Vector Store)
   https://www.kaggle.com/code/ksmooi/langchain-chroma-quick-reference-vector-store
 
-## Retriever
+### Retriever
 
 - LangChain: MultiQueryRetriever Quick Reference
   https://www.kaggle.com/code/ksmooi/langchain-multiqueryretriever-quick-reference
@@ -50,14 +50,8 @@
 - LangChain: EnsembleRetriever Quick Reference
   https://www.kaggle.com/code/ksmooi/langchain-ensembleretriever-quick-reference
 
-## Agentic RAG
 
-- LangGraph: Self RAG with Chroma
-  https://www.kaggle.com/code/ksmooi/langgraph-self-rag-with-chroma
-
-
-
-## Tool
+### Tool
 
 - LangChain: The Definitions of Tool Schema
   https://www.kaggle.com/code/ksmooi/langchain-the-definitions-of-tool-schema
@@ -84,7 +78,13 @@
 - LangChain: Data Analysis with REPL-Tool and LLM
   https://www.kaggle.com/code/ksmooi/langchain-data-analysis-with-repl-tool-and-llm
 
-### Agent
+### Agent Workflow
+
+- LangGraph: Pandas Code Generator
+  https://www.kaggle.com/code/ksmooi/langgraph-pandas-code-generator
+
+- LangGraph: AI Coder with Custom Library
+  https://www.kaggle.com/code/ksmooi/langgraph-ai-coder-with-custom-library
 
 - LangChain: Tool-Integrated with ReAct Agent
   https://www.kaggle.com/code/ksmooi/langchain-tool-integrated-with-react-agent
@@ -97,6 +97,12 @@
 
 - LangGraph: SQL Query Generation
   https://www.kaggle.com/code/ksmooi/langgraph-sql-query-generation
+
+
+### Agentic RAG
+
+- LangGraph: Self RAG with Chroma
+  https://www.kaggle.com/code/ksmooi/langgraph-self-rag-with-chroma
 
 
 
