@@ -4,8 +4,8 @@ Welcome to the **LangChain and LangGraph Practical Tutorial**, an additional ref
 
 #### **Prerequisites**
 Before diving into this course, it is highly recommended that you:
-- **Read the LangChain Textbook:** Gain a solid foundation in LangChain's core principles, functionalities, and applications.
-- **Read the LangGraph Textbook:** Understand the fundamentals of LangGraph, its architecture, and how it complements LangChain.
+- **[Read the LangChain Doc](https://python.langchain.com/docs/tutorials/) :** Gain a solid foundation in LangChain's core principles, functionalities, and applications.
+- **[Read the LangGraph Doc](https://langchain-ai.github.io/langgraph/tutorials/) :** Understand the fundamentals of LangGraph, its architecture, and how it complements LangChain.
 
 These textbooks will equip you with the necessary theoretical knowledge, enabling you to maximize the benefits of the practical examples provided in this tutorial.
 
