@@ -7,6 +7,17 @@
 - LangChain: Mastering Text Splitting
   https://www.kaggle.com/code/ksmooi/langchain-mastering-text-splitting
 
+## Indexing
+
+- LangChain: Document Indexing Comprehensive Guide
+  https://www.kaggle.com/code/ksmooi/langchain-document-indexing-comprehensive-guide
+
+- LangChain: Caching Embeddings Designs
+  https://www.kaggle.com/code/ksmooi/langchain-caching-embeddings-designs
+
+- LangChain: Chroma Quick Reference (Vector Store)
+  https://www.kaggle.com/code/ksmooi/langchain-chroma-quick-reference-vector-store
+
 ## Retriever
 
 - LangChain: MultiQueryRetriever Quick Reference
