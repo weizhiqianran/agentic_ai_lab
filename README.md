@@ -10,7 +10,7 @@ Before diving into this course, it is highly recommended that you:
 These textbooks will equip you with the necessary theoretical knowledge, enabling you to maximize the benefits of the practical examples provided in this tutorial.
 
 #### **Course Structure**
-The tutorial is organized into several comprehensive sections, each focusing on different aspects of LangChain and LangGraph. Below is an overview of each module and the corresponding Kaggle notebooks that serve as practical references:
+The tutorial is organized into several comprehensive sections, each focusing on different aspects of LangChain and LangGraph. Below is an overview of each module and the corresponding [Kaggle notebooks](https://www.kaggle.com/ksmooi) that serve as practical references:
 
 ---
 
