@@ -1,4 +1,19 @@
 
+## LCEL
+
+- LangChain: LCEL Quick Reference
+  https://www.kaggle.com/code/ksmooi/langchain-lcel-quick-reference
+
+- LangChain: Message Design Quick Reference
+  https://www.kaggle.com/code/ksmooi/langchain-message-design-quick-reference
+
+- LangChain: Output Parser Quick Reference
+  https://www.kaggle.com/code/ksmooi/langchain-output-parser-quick-reference
+
+- LangChain: Prompt Templates Quick Reference
+  https://www.kaggle.com/code/ksmooi/langchain-prompt-templates-quick-reference
+
+
 ## Splitter
 
 - Markdown Extraction for RAG Workflows (MarkItDown)
