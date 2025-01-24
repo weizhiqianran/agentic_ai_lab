@@ -21,18 +21,18 @@
 
 ### Built-in Tools
 
-- LangChain Built-in Tool: DuckDuckGo (Web Search)
-  https://www.kaggle.com/code/ksmooi/langchain-built-in-tool-duckduckgo-web-search
+- LangChain: DuckDuckGo Quick Guide (Web Search)
+  https://www.kaggle.com/code/ksmooi/langchain-duckduckgo-quick-guide-web-search
 
-- LangChain Built-in Tool: SQLDatabase Toolkit
-  https://www.kaggle.com/code/ksmooi/langchain-built-in-tool-sqldatabase-toolkit
+- LangChain: SQLDatabase Built-In Toolkit Guide
+  https://www.kaggle.com/code/ksmooi/langchain-sqldatabase-built-in-toolkit-guide
 
-- Data Analysis with PythonREPLTool and LLM
-  https://www.kaggle.com/code/ksmooi/data-analysis-with-pythonrepltool-and-llm
+- LangChain: Data Analysis with REPL-Tool and LLM
+  https://www.kaggle.com/code/ksmooi/langchain-data-analysis-with-repl-tool-and-llm
 
 ### Agent
 
-- LangChain Tool-Integrated with ReAct Agent
+- LangChain: Tool-Integrated with ReAct Agent
   https://www.kaggle.com/code/ksmooi/langchain-tool-integrated-with-react-agent
 
 - LangGraph: From Planning to Execution
