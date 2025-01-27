@@ -68,6 +68,8 @@ Dive into the workflow of agents within LangChain and LangGraph, including code 
 - **[LangGraph: From Planning to Execution](https://www.kaggle.com/code/ksmooi/langgraph-from-planning-to-execution)**
 - **[LangChain: Pandas DataFrame Agent Guide](https://www.kaggle.com/code/ksmooi/langchain-pandas-dataframe-agent-guide)**
 - **[LangGraph: SQL Query Generation](https://www.kaggle.com/code/ksmooi/langgraph-sql-query-generation)**
+- **[LangGraph: Hierarchical Agent Teams](https://www.kaggle.com/code/ksmooi/langgraph-hierarchical-agent-teams)**
+- **[LangGraph: Dynamic Chart Generator (Agent Teams)](https://www.kaggle.com/code/ksmooi/langgraph-dynamic-chart-generator-agent-teams)**
 
 ### **8. Agentic RAG (Retrieval-Augmented Generation)**
 Enhance your RAG workflows with agentic capabilities, utilizing Chroma for adaptive, corrective, and self-driven data retrieval.
