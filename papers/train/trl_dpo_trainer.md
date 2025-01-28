@@ -4,14 +4,15 @@
 1. [Introduction](#introduction)
 2. [What is DPO?](#what-is-dpo)
 3. [How Does DPO Work?](#how-does-dpo-work)
-4. [Loss Function of DPO](#loss-function-of-dpo)
-5. [DPO vs. Traditional RLHF](#dpo-vs-traditional-rlhf)
-6. [Experiments and Results](#experiments-and-results)
-7. [Examples](#examples)
+4. [DPO Loss Function](#dpo-loss-function)
+5. [DPO Loss Behavior](#dpo-loss-behavior)
+6. [DPO vs. Traditional RLHF](#dpo-vs-traditional-rlhf)
+7. [Experiments and Results](#experiments-and-results)
+8. [Examples](#examples)
    - [Using DPOConfig and DPOTrainer](#using-dpoconfig-and-dpotrainer)
    - [Calculate Probabilities of Preferred Tokens](#calculate-probabilities-of-preferred-tokens)
-8. [Conclusion](#conclusion)
-9. [References](#references)
+9. [Conclusion](#conclusion)
+10. [References](#references)
 
 ---
 
@@ -62,7 +63,7 @@ In this example, DPO would adjust the model to make the preferred response more 
 
 ---
 
-## Loss Function of DPO
+## DPO Loss Function
 
 ### Introduction to Loss Function
 
@@ -89,9 +90,8 @@ DPO **adjusts the probability of generating preferred responses** while decreasi
 - Instead of training a separate **reward model**, DPO **directly shifts the LM's probability distribution** toward human preferences.  
 - The **logistic function ($\sigma$)** ensures that preference optimization remains stable.  
 
----
 
-### DPO Loss Explained: Preferred vs. Dispreferred
+## DPO Loss Behavior
 
 #### **Case 1: Preferred ≫ Dispreferred**
 - $\pi_{\theta}(y_w | x) \gg \pi_{\theta}(y_l | x)$, meaning the model assigns much higher probability to the preferred response than the dispreferred one.
