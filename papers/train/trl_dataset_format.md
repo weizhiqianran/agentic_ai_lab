@@ -40,6 +40,8 @@ Datasets in TRL are categorized based on their format and type:
 }
 ```
 
+---
+
 ### Prompt-Only
 **Standard:**
 ```json
@@ -55,6 +57,8 @@ Datasets in TRL are categorized based on their format and type:
   ]
 }
 ```
+
+---
 
 ### Prompt-Completion
 **Standard:**
@@ -75,6 +79,8 @@ Datasets in TRL are categorized based on their format and type:
   ]
 }
 ```
+
+---
 
 ### Preference (Explicit)
 **Standard:**
@@ -100,6 +106,8 @@ Datasets in TRL are categorized based on their format and type:
 }
 ```
 
+---
+
 ### Preference (Implicit)
 **Standard:**
 ```json
@@ -112,6 +120,8 @@ preference_example = {"chosen": [{"role": "user", "content": "What color is the 
                       "rejected": [{"role": "user", "content": "What color is the sky?"},
                                    {"role": "assistant", "content": "It is green."}]}
 ```
+
+---
 
 ### Unpaired Preference
 **Standard:**
@@ -134,6 +144,8 @@ preference_example = {"chosen": [{"role": "user", "content": "What color is the 
   "label": false
 }
 ```
+
+---
 
 ### Stepwise Supervision
 **Standard:**
