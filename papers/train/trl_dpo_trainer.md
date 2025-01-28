@@ -5,12 +5,12 @@
 2. [What is DPO?](#what-is-dpo)
 3. [How Does DPO Work?](#how-does-dpo-work)
 4. [DPO vs. Traditional RLHF](#dpo-vs-traditional-rlhf)
-5. [Advantages of DPO](#advantages-of-dpo)
-6. [Experiments and Results](#experiments-and-results)
-7. [Implementation with HuggingFace TRL](#implementation-with-huggingface-trl)
-8. [Limitations and Future Work](#limitations-and-future-work)
-9. [Conclusion](#conclusion)
-10. [References](#references)
+5. [Experiments and Results](#experiments-and-results)
+6. [Examples](#examples)
+   - [Using DPOConfig and DPOTrainer](#using-dpoconfig-and-dpotrainer)
+   - [Calculate Probabilities of Preferred Tokens](#calculate-probabilities-of-preferred-tokens)
+7. [Conclusion](#conclusion)
+8. [References](#references)
 
 ---
 
@@ -86,6 +86,63 @@ DPO **adjusts the probability of generating preferred responses** while decreasi
 - Instead of training a separate **reward model**, DPO **directly shifts the LM's probability distribution** toward human preferences.  
 - The **logistic function $(\sigma$)** ensures that preference optimization remains stable.  
 
+
+---
+
+### **Example: AI Writing Assistant**
+Imagine you are training a **chatbot** to answer user queries politely and informatively.
+
+**Input Prompt $(x$)**: "What is the capital of France?"
+
+#### **Two Model Responses**:
+1. **Preferred Response $(y_w$)**:  
+   _"The capital of France is Paris. It is known for its history, culture, and landmarks like the Eiffel Tower."_  
+   _(Well-structured and informative, preferred by human annotators.)_
+
+2. **Dispreferred Response $(y_l$)**:  
+   _"Paris."_  
+   _(Technically correct but lacks explanation, making it a dispreferred response.)_
+
+### **Computing the DPO Loss for This Example**  
+
+1. **Step 1: Compare Model Probabilities**
+   - Suppose the original reference model ($(\pi_{\text{ref}}$)) assigns the following probabilities:  
+     - $( \pi_{\text{ref}}(y_w | x) = 0.3 $)  
+     - $( \pi_{\text{ref}}(y_l | x) = 0.7 $)  
+   - The fine-tuned model ($(\pi_{\theta}$)) adjusts its probabilities after training:  
+     - $( \pi_{\theta}(y_w | x) = 0.7 $)  
+     - $( \pi_{\theta}(y_l | x) = 0.3 $)  
+
+2. **Step 2: Compute the Log Ratios**
+   - The model shift in probability is computed as:
+
+     $[
+     \log \frac{\pi_{\theta}(y_w | x)}{\pi_{\text{ref}}(y_w | x)}
+     = \log \frac{0.7}{0.3} = \log(2.33) \approx 0.84
+     $]
+
+     $[
+     \log \frac{\pi_{\theta}(y_l | x)}{\pi_{\text{ref}}(y_l | x)}
+     = \log \frac{0.3}{0.7} = \log(0.43) \approx -0.36
+     $]
+
+3. **Step 3: Compute the Shift in Preferences**
+   - The difference between the preferred and dispreferred response shifts is:
+     $[
+     0.84 - (-0.36) = 0.84 + 0.36 = 1.20
+     $]
+   - After applying the **logistic function $(\sigma$)**, we get a probability value **between 0 and 1**.
+
+4. **Step 4: Compute Final Loss**
+   - Taking the **logarithm** and negating the expectation results in a **minimization objective** that encourages the model to **increase the probability of $(y_w$) and decrease the probability of $(y_l$)**.
+   - The negative sign ensures that training moves in the right direction.
+
+### **What This Means for Training**
+- The model **learns to assign higher probability to better responses**.
+- It **moves away from poor responses** by reducing their probability.
+- The **logistic function ensures stability**, preventing extreme updates.
+- The **hyperparameter $( \beta $) controls the strength** of these updates.
+
 ---
 
 ## DPO vs. Traditional RLHF
@@ -141,9 +198,7 @@ DPO is a **simpler alternative** to RLHF that directly optimizes the model to al
 - **RLHF** requires two steps: training a reward model and then fine-tuning the LM using reinforcement learning.
 - **DPO** skips the reward model and directly optimizes the LM using a simple loss function.
 
----
-
-## Advantages of DPO
+### Advantages of DPO
 
 1. **Simplicity**: DPO eliminates the need for a separate reward model and reinforcement learning, making it easier to implement.
 2. **Stability**: The binary cross-entropy loss used in DPO is more stable than the reinforcement learning algorithms used in RLHF.
@@ -154,29 +209,25 @@ DPO is a **simpler alternative** to RLHF that directly optimizes the model to al
 
 ## Experiments and Results
 
-### Sentiment Control:
-- **Task**: Generate text with positive sentiment.
-- **Result**: DPO achieved higher reward with lower KL-divergence from the reference model compared to RLHF.
+<img src="../res/trl_dpo_figure3.jpg" width="800">
 
-### Summarization:
-- **Task**: Summarize Reddit posts.
-- **Result**: DPO outperformed RLHF in terms of win rate against human-written summaries, as evaluated by GPT-4.
+**Key Insight (Left)**: 
+- DPO is the **only method** that surpasses the **50% win rate** (dashed line), indicating that it produces **better-than-chosen** responses consistently.
 
-### Dialogue:
-- **Task**: Generate helpful responses to user queries.
-- **Result**: DPO improved over the baseline and matched the performance of the best-of-N sampling method, which is computationally expensive.
+**Key Insight (Right)**:  
+- The **win rate quickly improves** in the early stages of training.  
+- DPO maintains a **stable performance** over different temperatures, indicating **robust alignment to human preferences**.  
+- The win rate remains **above 50%**, proving that **DPO consistently improves dialogue responses**.  
 
-### Example Results:
+### Definition of Win Rate:
+- **Win Rate** is the percentage of times a model's response is preferred over another model’s response in human or automated evaluations.  
+- A higher **Win Rate** means that a model generates responses that are **more aligned with human preferences** compared to its competitor (e.g., RLHF).  
+- In these experiments, **GPT-4 or human evaluators** were used to compare outputs from **DPO-trained** and **RLHF-trained** models.
 
-| Task | DPO Win Rate | RLHF Win Rate |
-|------|--------------|---------------|
-| Sentiment Control | 85% | 80% |
-| Summarization | 61% | 57% |
-| Dialogue | 58% | 55% |
 
----
+## Examples
 
-## Implementation with HuggingFace TRL
+### Using DPOConfig and DPOTrainer
 
 DPO can be easily implemented using the **HuggingFace TRL (Transformer Reinforcement Learning)** library. Below is an example of how to fine-tune a model using DPO with the `DPOTrainer`:
 
@@ -211,20 +262,129 @@ trainer.train()
 
 ---
 
-## Limitations and Future Work
+### Calculate Probabilities of Preferred Tokens
 
-1. **Generalization**: More research is needed to understand how well DPO generalizes to out-of-distribution tasks.
-2. **Scaling**: While DPO has been tested on models up to 6B parameters, its performance on larger models (e.g., GPT-4) needs further exploration.
-3. **Reward Over-Optimization**: There is a risk of over-optimizing for the reward, which could lead to degraded performance in some cases.
-4. **Evaluation**: The reliance on GPT-4 for evaluation raises questions about the best way to elicit high-quality judgments from automated systems.
+This Python script defines a function `compute_dpo_logprobs` that calculates **log probabilities** for **preferred (chosen) and dispreferred (rejected) responses** using a **policy model** (fine-tuned model) and a **reference model** (original base model). The computed log-probabilities are used for **Direct Preference Optimization (DPO)**.
 
----
+```python
+import torch
+import torch.nn.functional as F
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from typing import Dict, Tuple
+
+def compute_dpo_logprobs(
+    policy_model: AutoModelForCausalLM,
+    reference_model: AutoModelForCausalLM,
+    tokenizer: AutoTokenizer,
+    prompt: str,
+    chosen: str,
+    rejected: str,
+    max_length: int = 512,
+    device: str = "cuda"
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """
+    Compute log probabilities for chosen and rejected responses using policy and reference models.
+    
+    Args:
+        policy_model: The policy model (usually fine-tuned model)
+        reference_model: The reference model (usually base model)
+        tokenizer: Tokenizer for both models
+        prompt: Input prompt text
+        chosen: Chosen/preferred completion
+        rejected: Rejected/non-preferred completion
+        max_length: Maximum sequence length
+        device: Device to run computation on
+        
+    Returns:
+        Tuple containing:
+        - policy_chosen_logprobs: Log probs of chosen completion from policy model
+        - policy_rejected_logprobs: Log probs of rejected completion from policy model
+        - ref_chosen_logprobs: Log probs of chosen completion from reference model
+        - ref_rejected_logprobs: Log probs of rejected completion from reference model
+    """
+    # Tokenize inputs
+    chosen_tokens = tokenizer(chosen, return_tensors="pt", max_length=max_length, truncation=True)
+    rejected_tokens = tokenizer(rejected, return_tensors="pt", max_length=max_length, truncation=True)
+    prompt_tokens = tokenizer(prompt, return_tensors="pt", max_length=max_length, truncation=True)
+    
+    # Move inputs to device
+    chosen_tokens = {k: v.to(device) for k, v in chosen_tokens.items()}
+    rejected_tokens = {k: v.to(device) for k, v in rejected_tokens.items()}
+    prompt_tokens = {k: v.to(device) for k, v in prompt_tokens.items()}
+    
+    # Helper function to compute log probabilities
+    def get_logprobs(model: AutoModelForCausalLM, input_ids: torch.Tensor) -> torch.Tensor:
+        with torch.no_grad():
+            outputs = model(input_ids=input_ids, labels=input_ids)
+            logits = outputs.logits[:, :-1, :]  # Remove last token prediction
+            labels = input_ids[:, 1:]  # Shift labels right
+            
+            # Compute log probabilities
+            log_probs = F.log_softmax(logits, dim=-1)
+            token_log_probs = log_probs.gather(-1, labels.unsqueeze(-1)).squeeze(-1)
+            
+            # Mask padding tokens
+            attention_mask = (labels != tokenizer.pad_token_id).float()
+            token_log_probs = token_log_probs * attention_mask
+            
+            return token_log_probs.sum(dim=-1)
+    
+    # Get sequence log probabilities for both models
+	# In autoregressive (decoder-only) transformers, the model predicts the next token based on all previous tokens.
+	# We input the chosen/rejected responses to calculate probabilities for each next-token prediction.
+    with torch.no_grad():
+        # Policy model log probs
+        policy_chosen_logprobs = get_logprobs(policy_model, chosen_tokens["input_ids"])
+        policy_rejected_logprobs = get_logprobs(policy_model, rejected_tokens["input_ids"])
+        
+        # Reference model log probs
+        ref_chosen_logprobs = get_logprobs(reference_model, chosen_tokens["input_ids"])
+        ref_rejected_logprobs = get_logprobs(reference_model, rejected_tokens["input_ids"])
+    
+    return (
+        policy_chosen_logprobs,
+        policy_rejected_logprobs,
+        ref_chosen_logprobs,
+        ref_rejected_logprobs
+    )
+
+# Example usage
+def main():
+    # Load models and tokenizer
+    policy_model = AutoModelForCausalLM.from_pretrained("path/to/policy/model").to("cuda")
+    reference_model = AutoModelForCausalLM.from_pretrained("path/to/reference/model").to("cuda")
+    tokenizer = AutoTokenizer.from_pretrained("path/to/tokenizer")
+    
+    # Example inputs
+    prompt = "What is the capital of France?"
+    chosen = "The capital of France is Paris."
+    rejected = "The capital of France is London."
+    
+    # Compute log probabilities
+    logprobs = compute_dpo_logprobs(
+        policy_model=policy_model,
+        reference_model=reference_model,
+        tokenizer=tokenizer,
+        prompt=prompt,
+        chosen=chosen,
+        rejected=rejected
+    )
+    
+    policy_chosen_logprobs, policy_rejected_logprobs, ref_chosen_logprobs, ref_rejected_logprobs = logprobs
+    
+    # Print results
+    print(f"Policy model chosen logprob: {policy_chosen_logprobs.item():.4f}")
+    print(f"Policy model rejected logprob: {policy_rejected_logprobs.item():.4f}")
+    print(f"Reference model chosen logprob: {ref_chosen_logprobs.item():.4f}")
+    print(f"Reference model rejected logprob: {ref_rejected_logprobs.item():.4f}")
+
+if __name__ == "__main__":
+    main()
+```
 
 ## Conclusion
 
 **Direct Preference Optimization (DPO)** is a promising new method for aligning language models with human preferences. By simplifying the fine-tuning process and eliminating the need for reinforcement learning, DPO makes it easier to train models that are both safe and effective. While there are still challenges to address, DPO represents a significant step forward in the field of AI alignment.
-
----
 
 ## References
 
