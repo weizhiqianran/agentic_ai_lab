@@ -4,13 +4,14 @@
 1. [Introduction](#introduction)
 2. [What is DPO?](#what-is-dpo)
 3. [How Does DPO Work?](#how-does-dpo-work)
-4. [DPO vs. Traditional RLHF](#dpo-vs-traditional-rlhf)
-5. [Experiments and Results](#experiments-and-results)
-6. [Examples](#examples)
+4. [Loss Function of DPO](#loss-function-of-dpo)
+5. [DPO vs. Traditional RLHF](#dpo-vs-traditional-rlhf)
+6. [Experiments and Results](#experiments-and-results)
+7. [Examples](#examples)
    - [Using DPOConfig and DPOTrainer](#using-dpoconfig-and-dpotrainer)
    - [Calculate Probabilities of Preferred Tokens](#calculate-probabilities-of-preferred-tokens)
-7. [Conclusion](#conclusion)
-8. [References](#references)
+8. [Conclusion](#conclusion)
+9. [References](#references)
 
 ---
 
@@ -61,57 +62,96 @@ In this example, DPO would adjust the model to make the preferred response more 
 
 ---
 
-## Breaking Down the Formula
+## Loss Function of DPO
+
+### Introduction to Loss Function
 
 DPO **adjusts the probability of generating preferred responses** while decreasing the probability of dispreferred ones. Given a dataset **D** of **(prompt, preferred response, dispreferred response)** pairs, the model is optimized so that:  
-- The preferred response **$(y_w$)** is **more likely**.  
-- The dispreferred response **$(y_l$)** is **less likely**.  
+- The preferred response **($y_w$)** is **more likely**.  
+- The dispreferred response **($y_l$)** is **less likely**.  
 
 <img src="../res/trl_dpo_formula.jpg" width="700">
 
 **Key Components Explained Simply:**  
-- **$( \pi_{\theta} $)**: The policy (language model) we are optimizing.  
-- **$( \pi_{\text{ref}} $)**: The reference policy (initial model before fine-tuning).  
-- **$( \mathbb{E}_{(x, y_w, y_l) \sim D} $)**: Aggregation over all preference data points in the dataset **D**.
+- **$\pi_{\theta}$**: The policy (language model) we are optimizing.  
+- **$\pi_{\text{ref}}$**: The reference policy (initial model before fine-tuning).  
+- **$\mathbb{E}_{(x, y_w, y_l) \sim D}$**: Aggregation over all preference data points in the dataset **D**.
 - The negative expectation **(-)** in the DPO loss function ensures that we maximize the likelihood of preferred responses while minimizing the likelihood of dispreferred ones.
-- **$( \log \sigma(\cdot) $)**: A logistic function to convert outputs into probabilities.  
-- **$( \beta \log \frac{\pi_{\theta}(y_w | x)}{\pi_{\text{ref}}(y_w | x)} $)**: **Encourages** the model to increase the likelihood of preferred responses (**$( y_w $)**).  
-- **$( \beta \log \frac{\pi_{\theta}(y_l | x)}{\pi_{\text{ref}}(y_l | x)} $)**: **Discourages** the model from selecting dispreferred responses (**$( y_l $)**). 
-- **If $( \pi_{\theta}(y_w | x) $) is larger than $( \pi_{\text{ref}}(y_w | x) $)**, the term increases the model’s preference for $( y_w $).
-- **If $( \pi_{\theta}(y_l | x) $) is smaller than $( \pi_{\text{ref}}(y_l | x) $)**, the term encourages the model to **reduce** the likelihood of generating $( y_l $).
-- The **hyperparameter $( \beta $) controls the strength** of these updates (increase more likely, descress less likely).
+- **$\log \sigma(\cdot)$**: A logistic function to convert outputs into probabilities.  
+- **$\beta \log \frac{\pi_{\theta}(y_w | x)}{\pi_{\text{ref}}(y_w | x)}$**: **Encourages** the model to increase the likelihood of preferred responses (**$y_w$**).  
+- **$\beta \log \frac{\pi_{\theta}(y_l | x)}{\pi_{\text{ref}}(y_l | x)}$**: **Discourages** the model from selecting dispreferred responses (**$y_l$**). 
+- **If $\pi_{\theta}(y_w | x)$ is larger than $\pi_{\text{ref}}(y_w | x)$**, the term increases the model’s preference for ($y_w$).
+- **If $\pi_{\theta}(y_l | x)$ is smaller than $\pi_{\text{ref}}(y_l | x)$**, the term encourages the model to **reduce** the likelihood of generating ($y_l$).
+- The **hyperparameter $\beta$ controls the strength** of these updates (increase more likely, descress less likely).
 
 **Why Does This Work?**  
 - The **difference in log probabilities** between preferred and dispreferred responses determines the shift in model behavior.  
 - Instead of training a separate **reward model**, DPO **directly shifts the LM's probability distribution** toward human preferences.  
-- The **logistic function $(\sigma$)** ensures that preference optimization remains stable.  
+- The **logistic function ($\sigma$)** ensures that preference optimization remains stable.  
 
+---
+
+### DPO Loss Explained: Preferred vs. Dispreferred
+
+#### **Case 1: Preferred ≫ Dispreferred**
+- $\pi_{\theta}(y_w | x) \gg \pi_{\theta}(y_l | x)$, meaning the model assigns much higher probability to the preferred response than the dispreferred one.
+- The term inside the sigmoid is **strongly positive**, leading $\sigma(\cdot)$ to be close to **1**.
+- Since $\log(1) = 0$, the DPO loss approaches **zero** (i.e., the model is already well-aligned with preference data).
+- This means the policy model has successfully learned to favor the preferred response.
+
+👉 **Result**: **Loss is low** → No further adjustment needed.
+
+#### **Case 2: Preferred ≈ Dispreferred**
+- $\pi_{\theta}(y_w | x) \approx \pi_{\theta}(y_l | x)$, meaning the model assigns similar probabilities to both completions.
+- The term inside the sigmoid is **close to zero**, so $\sigma(\cdot) \approx 0.5$.
+- Since $\log(0.5)$ is **negative**, the DPO loss is **nonzero and contributes to optimization**.
+- The model is **uncertain** in distinguishing between the better and worse completions.
+
+👉 **Result**: **Loss is moderate** → Model is pushed to **increase probability of the preferred response** and decrease probability of the dispreferred one.
+
+#### **Case 3: Preferred ≪ Dispreferred**
+- $\pi_{\theta}(y_w | x) \ll \pi_{\theta}(y_l | x)$, meaning the model assigns higher probability to the **dispreferred** completion.
+- The term inside the sigmoid is **strongly negative**, making $\sigma(\cdot)$ close to **0**.
+- Since $\log(\text{small value})$ is **highly negative**, the loss becomes **large**.
+- The optimizer is strongly **penalized** for assigning high probability to the dispreferred response.
+
+👉 **Result**: **Loss is high** → Strong gradient updates to **correct the model’s behavior** by increasing the probability of the preferred response and decreasing that of the dispreferred one.
+
+#### **Summary**
+
+| Case | Preferred vs Dispreferred | Logits Ratio | Loss Value | Training Effect |
+|------|---------------------------|--------------|------------|----------------|
+| **Preferred ≫ Dispreferred** | $\pi_{\theta}(y_w \| x) \gg \pi_{\theta}(y_l \| x)$     | **Large positive** | **Low** | Model is aligned |
+| **Preferred ≈ Dispreferred**  | $\pi_{\theta}(y_w \| x) \approx \pi_{\theta}(y_l \| x)$ | **Close to zero** | **Moderate** | Model is adjusted |
+| **Preferred ≪ Dispreferred** | $\pi_{\theta}(y_w \| x) \ll \pi_{\theta}(y_l \| x)$     | **Large negative** | **High** | Model is corrected |
+
+Thus, the DPO loss effectively **encourages the model to prefer better responses over worse ones** while aligning with a base reference model.
 
 ---
 
 ### **Example: AI Writing Assistant**
 Imagine you are training a **chatbot** to answer user queries politely and informatively.
 
-**Input Prompt $(x$)**: "What is the capital of France?"
+**Input Prompt ($x$)**: "What is the capital of France?"
 
 #### **Two Model Responses**:
-1. **Preferred Response $(y_w$)**:  
+1. **Preferred Response ($y_w$)**:  
    _"The capital of France is Paris. It is known for its history, culture, and landmarks like the Eiffel Tower."_  
    _(Well-structured and informative, preferred by human annotators.)_
 
-2. **Dispreferred Response $(y_l$)**:  
+2. **Dispreferred Response ($y_l$)**:  
    _"Paris."_  
    _(Technically correct but lacks explanation, making it a dispreferred response.)_
 
 ### **Computing the DPO Loss for This Example**  
 
 1. **Step 1: Compare Model Probabilities**
-   - Suppose the original reference model ($(\pi_{\text{ref}}$)) assigns the following probabilities:  
-     - $( \pi_{\text{ref}}(y_w | x) = 0.3 $)  
-     - $( \pi_{\text{ref}}(y_l | x) = 0.7 $)  
+   - Suppose the original reference model ($\pi_{\text{ref}}$) assigns the following probabilities:  
+     - $\pi_{\text{ref}}(y_w | x) = 0.3$  
+     - $\pi_{\text{ref}}(y_l | x) = 0.7$  
    - The fine-tuned model ($(\pi_{\theta}$)) adjusts its probabilities after training:  
-     - $( \pi_{\theta}(y_w | x) = 0.7 $)  
-     - $( \pi_{\theta}(y_l | x) = 0.3 $)  
+     - $\pi_{\theta}(y_w | x) = 0.7$  
+     - $\pi_{\theta}(y_l | x) = 0.3$  
 
 2. **Step 2: Compute the Log Ratios**
    - The model shift in probability is computed as:
@@ -119,19 +159,19 @@ Imagine you are training a **chatbot** to answer user queries politely and infor
      $[
      \log \frac{\pi_{\theta}(y_w | x)}{\pi_{\text{ref}}(y_w | x)}
      = \log \frac{0.7}{0.3} = \log(2.33) \approx 0.84
-     $]
+     ]$
 
      $[
      \log \frac{\pi_{\theta}(y_l | x)}{\pi_{\text{ref}}(y_l | x)}
      = \log \frac{0.3}{0.7} = \log(0.43) \approx -0.36
-     $]
+     ]$
 
 3. **Step 3: Compute the Shift in Preferences**
    - The difference between the preferred and dispreferred response shifts is:
      $[
      0.84 - (-0.36) = 0.84 + 0.36 = 1.20
-     $]
-   - After applying the **logistic function $(\sigma$)**, we get a probability value **between 0 and 1**.
+     ]$
+   - After applying the **logistic function $\sigma$**, we get a probability value **between 0 and 1**.
 
 4. **Step 4: Compute Final Loss**
    - Taking the **logarithm** and negating the expectation results in a **minimization objective** that encourages the model to **increase the probability of $(y_w$) and decrease the probability of $(y_l$)**.
@@ -141,7 +181,7 @@ Imagine you are training a **chatbot** to answer user queries politely and infor
 - The model **learns to assign higher probability to better responses**.
 - It **moves away from poor responses** by reducing their probability.
 - The **logistic function ensures stability**, preventing extreme updates.
-- The **hyperparameter $( \beta $) controls the strength** of these updates.
+- The **hyperparameter $\beta$ controls the strength** of these updates.
 
 ---
 
@@ -314,32 +354,41 @@ def compute_dpo_logprobs(
     
     # Helper function to compute log probabilities
     def get_logprobs(model: AutoModelForCausalLM, input_ids: torch.Tensor) -> torch.Tensor:
+        """
+        Compute the log probabilities for the sequence of tokens.
+        
+        Args:
+            model: The language model
+            input_ids: Input token IDs (shape: [1, seq_len])
+        
+        Returns:
+            Log probabilities for the input sequence (shape: [1])
+        """
         with torch.no_grad():
             outputs = model(input_ids=input_ids, labels=input_ids)
-            logits = outputs.logits[:, :-1, :]  # Remove last token prediction
-            labels = input_ids[:, 1:]  # Shift labels right
+            logits = outputs.logits[:, :-1, :]  # Remove last token prediction (shape: [1, seq_len-1, vocab_size])
+            labels = input_ids[:, 1:]           # Shift labels to the right (shape: [1, seq_len-1])
             
             # Compute log probabilities
-            log_probs = F.log_softmax(logits, dim=-1)
-            token_log_probs = log_probs.gather(-1, labels.unsqueeze(-1)).squeeze(-1)
+            log_probs = F.log_softmax(logits, dim=-1)  # Log probs for each token (shape: [1, seq_len-1, vocab_size])
+            token_log_probs = log_probs.gather(-1, labels.unsqueeze(-1)).squeeze(-1)  # Log probs of correct tokens (shape: [1, seq_len-1])
             
             # Mask padding tokens
-            attention_mask = (labels != tokenizer.pad_token_id).float()
-            token_log_probs = token_log_probs * attention_mask
+            attention_mask = (labels != tokenizer.pad_token_id).float()  # Mask for non-padding tokens (shape: [1, seq_len-1])
+            token_log_probs = token_log_probs * attention_mask           # Masked log probs (shape: [1, seq_len-1])
             
-            return token_log_probs.sum(dim=-1)
+            # Sum log probs over sequence to get sequence log prob
+            return token_log_probs.sum(dim=-1)  # Sequence log prob (shape: [1])
     
     # Get sequence log probabilities for both models
-	# In autoregressive (decoder-only) transformers, the model predicts the next token based on all previous tokens.
-	# We input the chosen/rejected responses to calculate probabilities for each next-token prediction.
     with torch.no_grad():
         # Policy model log probs
-        policy_chosen_logprobs = get_logprobs(policy_model, chosen_tokens["input_ids"])
-        policy_rejected_logprobs = get_logprobs(policy_model, rejected_tokens["input_ids"])
+        policy_chosen_logprobs = get_logprobs(policy_model, chosen_tokens["input_ids"])      # Shape: [1]
+        policy_rejected_logprobs = get_logprobs(policy_model, rejected_tokens["input_ids"])  # Shape: [1]
         
         # Reference model log probs
-        ref_chosen_logprobs = get_logprobs(reference_model, chosen_tokens["input_ids"])
-        ref_rejected_logprobs = get_logprobs(reference_model, rejected_tokens["input_ids"])
+        ref_chosen_logprobs = get_logprobs(reference_model, chosen_tokens["input_ids"])      # Shape: [1]
+        ref_rejected_logprobs = get_logprobs(reference_model, rejected_tokens["input_ids"])  # Shape: [1]
     
     return (
         policy_chosen_logprobs,
