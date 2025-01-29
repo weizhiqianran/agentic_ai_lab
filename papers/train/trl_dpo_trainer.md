@@ -73,7 +73,8 @@ DPO **adjusts the probability of generating preferred responses** while decreasi
 
 <img src="../res/trl_dpo_formula.jpg" width="700">
 
-**Key Components Explained Simply:**  
+**Key Components Explained Simply:**
+- $ x $: The input prompt
 - **$\pi_{\theta}$**: The policy (language model) we are optimizing.  
 - **$\pi_{\text{ref}}$**: The reference policy (initial model before fine-tuning).  
 - **$\mathbb{E}_{(x, y_w, y_l) \sim D}$**: Aggregation over all preference data points in the dataset **D**.
