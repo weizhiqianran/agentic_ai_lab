@@ -30,7 +30,7 @@ The choice of dataset type depends on the task and the specific TRL trainer bein
 | `DPOTrainer (IPO)`         | Offline      | [Preference (explicit)](#preference-explicit) |              |              |              | Yes          |
 | `CPOTrainer`               | Offline      | [Preference (explicit)](#preference-explicit) |              |              |              | Yes          |
 | `CPOTrainer (SimPO)`       | Offline      | [Preference (explicit)](#preference-explicit) |              |              |              | Yes          |
-| ORPOTrainer                | Offline      | [Preference (explicit)](#preference-explicit) |              |              |              | Yes          |
+| `ORPOTrainer`              | Offline      | [Preference (explicit)](#preference-explicit) |              |              |              | Yes          |
 | KTOTrainer                 | Offline      | [Unpaired preference](#unpaired-preference)   | Yes          |              |              | Yes          |
 | `OnlineDPOTrainer (OAIF)`  | Online       | [Prompt-only](#prompt-only)                   | Yes          | Yes          |              | Yes          |
 | XPOTrainer                 | Online       | [Prompt-only](#prompt-only)                   | Yes          | Yes          |              | Yes          |
