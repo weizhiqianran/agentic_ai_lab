@@ -2,7 +2,8 @@
 
 ## Table of Contents
 1. [Introduction](#introduction)
-2. [Type of Text Datasets](#type-of-text-datasets)
+2. [Dataset Types for TRL Trainers](#dataset-types-for-trl-trainers)
+3. [Type of Text Datasets](#type-of-text-datasets)
    - [Language Modeling](#language-modeling)
    - [Prompt-Only](#prompt-only)
    - [Prompt-Completion](#prompt-completion)
@@ -10,12 +11,32 @@
    - [Preference (Implicit)](#preference-implicit)
    - [Unpaired Preference](#unpaired-preference)
    - [Stepwise Supervision](#stepwise-supervision)
-3. [Vision Datasets](#vision-datasets)
-4. [Choosing the Right Dataset Type](#choosing-the-right-dataset-type)
+4. [Vision Datasets](#vision-datasets)
 5. [Conclusion](#conclusion)
 
 ## Introduction
+
 HuggingFace's TRL (Transformer Reinforcement Learning) library provides a robust framework for fine-tuning large language models (LLMs) using reinforcement learning techniques. A critical aspect of this process is the preparation and formatting of datasets, which vary depending on the specific task and trainer being used. This article provides an overview of the dataset formats and types supported by TRL, along with guidance on how to structure your data for different tasks.
+
+## Dataset Types for TRL Trainers
+
+The choice of dataset type depends on the task and the specific TRL trainer being used. Below is a summary of the dataset types supported by each TRL trainer:
+
+| Trainer                    | RL Type      | Expected Dataset Type                         | ref_model    | reward_model | reward_funcs | peft_config  |
+|----------------------------|--------------|-----------------------------------------------|--------------|--------------|--------------|--------------|
+| `SFTTrainer`               | N/A          | [Language modeling](#language-modeling)       |              |              |              | Yes          |
+| `RewardTrainer`            | Reward Model | [Preference (implicit)](#preference-implicit) |              |              |              | Yes          |
+| `DPOTrainer`               | Offline      | [Preference (explicit)](#preference-explicit) | Yes          |              |              | Yes          |
+| `DPOTrainer (IPO)`         | Offline      | [Preference (explicit)](#preference-explicit) |              |              |              | Yes          |
+| `CPOTrainer`               | Offline      | [Preference (explicit)](#preference-explicit) |              |              |              | Yes          |
+| `CPOTrainer (SimPO)`       | Offline      | [Preference (explicit)](#preference-explicit) |              |              |              | Yes          |
+| ORPOTrainer                | Offline      | [Preference (explicit)](#preference-explicit) |              |              |              | Yes          |
+| KTOTrainer                 | Offline      | [Unpaired preference](#unpaired-preference)   | Yes          |              |              | Yes          |
+| `OnlineDPOTrainer (OAIF)`  | Online       | [Prompt-only](#prompt-only)                   | Yes          | Yes          |              | Yes          |
+| XPOTrainer                 | Online       | [Prompt-only](#prompt-only)                   | Yes          | Yes          |              | Yes          |
+| NashMDTrainer              | Online       | [Prompt-only](#prompt-only)                   | Yes          | Yes          |              | Yes          |
+| `GRPOTrainer`              | Online       | [Prompt-only](#prompt-only)                   |              |              | Yes          | Yes          |
+
 
 ## Type of Text Datasets
 
@@ -183,22 +204,6 @@ Some trainers in TRL support fine-tuning vision-language models (VLMs) using ima
     {"type": "text", "text": "What color is the sky in the image?"}
 ]
 ```
-
-## Choosing the Right Dataset Type
-The choice of dataset type depends on the task and the specific TRL trainer being used. Below is a summary of the dataset types supported by each TRL trainer:
-
-| Trainer               | RL Type      | Expected Dataset Type                         | ref_model    | reward_model | reward_funcs | peft_config  |
-|-----------------------|--------------|-----------------------------------------------|--------------|--------------|--------------|--------------|
-| `SFTTrainer`          | N/A          | [Language modeling](#language-modeling)       |              |              |              | Yes          |
-| `RewardTrainer`       | Reward Model | [Preference (implicit)](#preference-implicit) |              |              |              | Yes          |
-| `DPOTrainer`          | Offline      | [Preference (explicit)](#preference-explicit) | Yes          |              |              | Yes          |
-| `CPOTrainer (SimPO)`  | Offline      | [Preference (explicit)](#preference-explicit) |              |              |              | Yes          |
-| ORPOTrainer           | Offline      | [Preference (explicit)](#preference-explicit) |              |              |              | Yes          |
-| KTOTrainer            | Offline      | [Unpaired preference](#unpaired-preference)   | Yes          |              |              | Yes          |
-| `GRPOTrainer`         | Online       | [Prompt-only](#prompt-only)                   |              |              | Yes          | Yes          |
-| OnlineDPOTrainer      | Online       | [Prompt-only](#prompt-only)                   | Yes          | Yes          |              | Yes          |
-| XPOTrainer            | Online       | [Prompt-only](#prompt-only)                   | Yes          | Yes          |              | Yes          |
-| NashMDTrainer         | Online       | [Prompt-only](#prompt-only)                   | Yes          | Yes          |              | Yes          |
 
 ## Conclusion
 Understanding the dataset formats and types supported by HuggingFace TRL is essential for effectively fine-tuning LLMs and VLMs. By selecting the appropriate dataset type and format for your task, you can ensure optimal performance and compatibility with the TRL trainers. Whether you're working with text-based or vision-language models, TRL provides the flexibility and tools needed to achieve your goals.
