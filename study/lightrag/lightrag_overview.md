@@ -1,57 +1,68 @@
-# Introducing LightRAG: A Comprehensive Guide
+# Introduction to LightRAG: A Comprehensive Guide
 
-**Table of Contents**
-
-1. [Introduction](#introduction)
-2. [What is LightRAG?](#what-is-lightrag)
-3. [Getting Started](#getting-started)
-    - [Installation](#installation)
-    - [Basic Configuration](#basic-configuration)
-4. [LightRAG Public Interface](#lightrag-public-interface)
-    - [Initialization](#initialization)
-    - [Inserting Documents](#inserting-documents)
-    - [Querying Data](#querying-data)
-    - [Deleting Documents](#deleting-documents)
-    - [Managing Entities and Relationships](#managing-entities-and-relationships)
-    - [Retrieving Information](#retrieving-information)
-5. [Practical Examples](#practical-examples)
-    - [Example 1: Inserting Multiple Documents, Querying, and Deleting](#example-1-inserting-multiple-documents-querying-and-deleting)
-    - [Example 2: Custom Chunk Insertion](#example-2-custom-chunk-insertion)
-    - [Example 3: Advanced Query with Keyword Extraction](#example-3-advanced-query-with-keyword-extraction)
-6. [Best Practices](#best-practices)
-7. [Conclusion](#conclusion)
+In the rapidly evolving landscape of artificial intelligence and data management, efficient retrieval and analysis of information are paramount. **LightRAG** emerges as a powerful tool designed to bridge the gap between large language models (LLMs) and structured knowledge bases. This article delves into the functionalities of LightRAG, exploring its public interface, and providing practical examples to help you harness its full potential.
 
 ---
 
-## Introduction
+## Table of Contents
 
-In the rapidly evolving landscape of artificial intelligence and data management, efficient tools are essential for handling vast amounts of information. **LightRAG** emerges as a powerful solution, combining document management, entity extraction, and advanced querying capabilities. This article delves into LightRAG's public interface, offering a comprehensive overview and practical examples to help you harness its full potential.
+1. [What is LightRAG?](#what-is-lightrag)
+2. [Key Features](#key-features)
+3. [Public Interface of LightRAG](#public-interface-of-lightrag)
+    - [Initialization](#initialization)
+    - [Inserting Documents](#inserting-documents)
+        - [`insert`](#insert)
+        - [`ainsert`](#ainsert)
+        - [`insert_custom_chunks`](#insert_custom_chunks)
+        - [`insert_custom_kg`](#insert_custom_kg)
+    - [Querying Data](#querying-data)
+        - [`query`](#query)
+        - [`aquery`](#aquery)
+        - [`query_with_separate_keyword_extraction`](#query_with_separate_keyword_extraction)
+    - [Managing Entities and Relationships](#managing-entities-and-relationships)
+        - [`delete_by_entity`](#delete_by_entity)
+        - [`get_entity_info`](#get_entity_info)
+        - [`get_relation_info`](#get_relation_info)
+    - [Managing Documents](#managing-documents)
+        - [`delete_by_doc_id`](#delete_by_doc_id)
+    - [Additional Utilities](#additional-utilities)
+        - [`get_graph_labels`](#get_graph_labels)
+        - [`get_graps`](#get_graps)
+4. [Getting Started: Installation and Setup](#getting-started-installation-and-setup)
+5. [Practical Examples](#practical-examples)
+    - [Example 1: Initializing LightRAG](#example-1-initializing-lightrag)
+    - [Example 2: Inserting Documents](#example-2-inserting-documents)
+    - [Example 3: Inserting Custom Knowledge Graphs](#example-3-inserting-custom-knowledge-graphs)
+    - [Example 4: Inserting Images with Custom Knowledge](#example-4-inserting-images-with-custom-knowledge)
+    - [Example 5: Inserting Charts (Images) with Custom Knowledge](#example-5-inserting-charts-(images)-with-custom-knowledge)
+    - [Example 6: Performing a Query](#example-6-performing-a-query)
+    - [Example 7: Deleting Entities and Documents](#example-7-deleting-entities-and-documents)
+6. [Advanced Usage](#advanced-usage)
+7. [Conclusion](#conclusion)
+8. [References](#references)
+
+---
 
 ## What is LightRAG?
 
-LightRAG is a versatile Python library designed to manage, process, and query large collections of documents. It leverages advanced techniques like text chunking, entity extraction, and knowledge graph construction to provide a robust framework for information retrieval and analysis. Whether you're building a knowledge base, conducting research, or developing AI-driven applications, LightRAG offers the tools you need to efficiently handle and utilize your data.
+**LightRAG** stands for **Light Retrieval-Augmented Generation**. It is a sophisticated framework that integrates large language models (LLMs) with structured knowledge graphs and vector databases. LightRAG facilitates efficient document management, entity extraction, relationship mapping, and intelligent querying, making it an invaluable tool for applications requiring deep understanding and retrieval of complex data structures.
 
-## Getting Started
+## Key Features
 
-### Installation
+- **Asynchronous Operations**: Leveraging Python's `asyncio` for non-blocking operations, ensuring high performance and scalability.
+- **Flexible Storage Options**: Supports various storage backends like NetworkX, Neo4J, MongoDB, Redis, and more.
+- **Entity and Relationship Management**: Automatic extraction and management of entities and their relationships within documents.
+- **Keyword Extraction**: Extracts high-level and low-level keywords to enhance query precision.
+- **Caching Mechanism**: Implements caching to optimize repeated queries and reduce computational overhead.
+- **Customizable Prompts**: Allows users to define custom prompts for tailored responses.
 
-Before diving into LightRAG, ensure you have Python installed. You can install LightRAG using pip:
+## Public Interface of LightRAG
 
-```bash
-pip install lightrag
-```
+LightRAG exposes a rich set of methods that enable users to interact with the system seamlessly. Below is an overview of its public interface, detailing the primary methods available for initialization, document insertion, querying, managing entities and relationships, and document management.
 
-*Note: Replace `lightrag` with the actual package name if different.*
+### Initialization
 
-Additionally, to handle asynchronous operations seamlessly in notebook environments like Kaggle, install `nest_asyncio`:
-
-```bash
-pip install nest_asyncio
-```
-
-### Basic Configuration
-
-LightRAG requires configuration to connect to various storage backends and set operational parameters. Here's a basic setup:
+To begin using LightRAG, you need to initialize it with the desired configurations.
 
 ```python
 from lightrag import LightRAG
@@ -59,45 +70,21 @@ from lightrag import LightRAG
 # Initialize LightRAG with default settings
 lightrag = LightRAG()
 
-# For custom configurations
-config = {
-    "working_dir": "./custom_lightrag_cache",
+# Initialize LightRAG with custom settings
+custom_config = {
+    "working_dir": "./custom_cache",
     "embedding_cache_config": {
         "enabled": True,
-        "similarity_threshold": 0.90,
+        "similarity_threshold": 0.9,
         "use_llm_check": True,
-    },
-    "kv_storage": "JsonKVStorage",
-    "vector_storage": "NanoVectorDBStorage",
-    "graph_storage": "NetworkXStorage",
-    "log_level": "INFO",
+    },,
+    "llm_model_kwargs": {"temperature": 0.0},
+    "kv_storage": "RedisKVStorage",
+    "vector_storage": "MilvusVectorDBStorage",
+    "graph_storage": "Neo4JStorage",
+    "llm_model_func": your_llm_function,  # Define your LLM function
+    "embedding_func": your_embedding_function,  # Define your embedding function
     # Add other configurations as needed
-}
-
-lightrag = LightRAG(**config)
-```
-
-## LightRAG Public Interface
-
-LightRAG offers a comprehensive set of methods to interact with your data. Below is an overview of its public interface, categorized by functionality.
-
-### Initialization
-
-The `LightRAG` class serves as the primary interface for interacting with the library. During initialization, you can specify various configurations such as storage backends, embedding settings, and logging preferences.
-
-```python
-from lightrag import LightRAG
-
-# Initialize with default parameters
-lightrag = LightRAG()
-
-# Initialize with custom parameters
-custom_config = {
-    "working_dir": "./my_lightrag_cache",
-    "log_level": "DEBUG",
-    "chunk_token_size": 1000,
-    "llm_model_name": "meta-llama/Llama-3.2-1B-Instruct",
-    # Add more configurations as needed
 }
 
 lightrag = LightRAG(**custom_config)
@@ -105,491 +92,510 @@ lightrag = LightRAG(**custom_config)
 
 ### Inserting Documents
 
-LightRAG allows you to insert single or multiple documents. It handles text chunking, entity extraction, and stores the processed data in the configured storage systems.
+LightRAG provides multiple methods to insert documents into the system, each catering to different use cases.
 
-#### Synchronous Insertion
+#### `insert`
+
+Inserts a single document or a list of documents into LightRAG. This method handles deduplication, chunking, and initial processing.
 
 ```python
-document = "Your document text goes here."
+# Synchronous insertion
+lightrag.insert("Your document content here.")
 
-# Insert a single document
-lightrag.insert(document)
-
-# Insert multiple documents
-documents = ["First document.", "Second document.", "Third document."]
+# Inserting multiple documents
+documents = [
+    "First document content.",
+    "Second document content.",
+    "Third document content."
+]
 lightrag.insert(documents)
 ```
 
-#### Asynchronous Insertion
+#### `ainsert`
 
-For non-blocking operations, use the asynchronous `ainsert` method.
+An asynchronous version of the `insert` method, allowing for non-blocking document insertion.
 
 ```python
 import asyncio
 
-async def insert_documents():
-    documents = ["Async doc 1.", "Async doc 2."]
-    await lightrag.ainsert(documents)
+async def add_documents():
+    await lightrag.ainsert("Asynchronously inserted document.")
 
-asyncio.run(insert_documents())
+asyncio.run(add_documents())
 ```
 
-*Note: In notebook environments like Kaggle, refer to [Practical Example 1](#example-1-inserting-multiple-documents-querying-and-deleting) for using `nest_asyncio`.*
+#### `insert_custom_chunks`
+
+Allows inserting documents with custom-defined chunks, providing greater control over how documents are segmented and stored.
+
+```python
+# Custom chunks
+full_text = "Complete document content."
+text_chunks = [
+    "First chunk of the document.",
+    "Second chunk of the document."
+]
+
+# Synchronous insertion
+lightrag.insert_custom_chunks(full_text, text_chunks)
+
+# Asynchronous insertion
+async def add_custom_chunks():
+    await lightrag.ainsert_custom_chunks(full_text, text_chunks)
+
+asyncio.run(add_custom_chunks())
+```
+
+#### `insert_custom_kg`
+
+Enables the insertion of custom knowledge graphs, allowing users to define entities, relationships, and their interconnections explicitly.
+
+```python
+# Custom Knowledge Graph
+custom_kg = {
+    "chunks": [
+        {"content": "Chunk content 1", "source_id": "doc-1"},
+        {"content": "Chunk content 2", "source_id": "doc-2"}
+    ],
+    "entities": [
+        {"entity_name": "Entity1", "entity_type": "TypeA", "description": "Description of Entity1", "source_id": "doc-1"},
+        {"entity_name": "Entity2", "entity_type": "TypeB", "description": "Description of Entity2", "source_id": "doc-2"}
+    ],
+    "relationships": [
+        {"src_id": "Entity1", "tgt_id": "Entity2", "description": "Relationship description", "keywords": "keyword1, keyword2", "weight": 1.0, "source_id": "doc-1"}
+    ]
+}
+
+# Synchronous insertion
+lightrag.insert_custom_kg(custom_kg)
+
+# Asynchronous insertion
+async def add_custom_kg():
+    await lightrag.ainsert_custom_kg(custom_kg)
+
+asyncio.run(add_custom_kg())
+```
 
 ### Querying Data
 
-LightRAG provides flexible querying capabilities, supporting various modes such as local, global, naive, and mix.
+LightRAG offers robust querying capabilities to retrieve information based on user queries, leveraging the underlying knowledge graph and vector databases.
 
-#### Synchronous Query
+#### `query`
+
+Performs a synchronous query against the stored documents and knowledge graph.
 
 ```python
-query = "What is the impact of AI on healthcare?"
-response = lightrag.query(query)
+# Simple query
+response = lightrag.query("What is the capital of France?")
 print(response)
 ```
 
-#### Asynchronous Query
+#### `aquery`
+
+An asynchronous version of the `query` method for non-blocking operations.
 
 ```python
 import asyncio
 
 async def perform_query():
-    query = "Explain the relationship between machine learning and data science."
-    response = await lightrag.aquery(query)
+    response = await lightrag.aquery("Explain the theory of relativity.")
     print(response)
 
 asyncio.run(perform_query())
 ```
 
-*Note: In notebook environments like Kaggle, refer to [Practical Example 1](#example-1-inserting-multiple-documents-querying-and-deleting) for using `nest_asyncio`.*
+#### `query_with_separate_keyword_extraction`
 
-### Deleting Documents
-
-You can delete documents either by their unique entity names or by document IDs.
-
-#### Delete by Entity
+Enhances the querying process by first extracting keywords before performing the main query, improving accuracy and relevance.
 
 ```python
-entity_name = "AI_Healthcare_Impact"
-lightrag.delete_by_entity(entity_name)
-```
-
-#### Delete by Document ID
-
-```python
-doc_id = "doc-1234567890abcdef"
-lightrag.delete_by_doc_id(doc_id)
+# Synchronous keyword-enhanced query
+response = lightrag.query_with_separate_keyword_extraction(
+    query="Describe the impact of climate change.",
+    prompt="Please provide a detailed analysis."
+)
+print(response)
 ```
 
 ### Managing Entities and Relationships
 
-LightRAG facilitates the management of entities and their interconnections within a knowledge graph.
+LightRAG facilitates the management of entities and their interrelationships within the knowledge graph, ensuring data integrity and comprehensive insights.
 
-#### Inserting Custom Knowledge Graph
+#### `delete_by_entity`
 
-```python
-custom_kg = {
-    "chunks": [
-        {"content": "Entity content here.", "source_id": "source-1"},
-        {"content": "Another entity content.", "source_id": "source-2"},
-    ],
-    "entities": [
-        {"entity_name": "Entity1", "entity_type": "TypeA", "description": "Description here.", "source_id": "source-1"},
-        {"entity_name": "Entity2", "entity_type": "TypeB", "description": "Another description.", "source_id": "source-2"},
-    ],
-    "relationships": [
-        {"src_id": "Entity1", "tgt_id": "Entity2", "description": "Relationship description.", "keywords": "keyword1, keyword2", "weight": 1.5, "source_id": "source-1"},
-    ]
-}
-
-lightrag.insert_custom_kg(custom_kg)
-```
-
-### Retrieving Information
-
-LightRAG allows retrieval of detailed information about entities and relationships.
-
-#### Get Entity Information
+Deletes an entity and all its associated relationships from the knowledge graph.
 
 ```python
-entity_info = asyncio.run(lightrag.get_entity_info("Entity1", include_vector_data=True))
-print(entity_info)
-```
+# Synchronous deletion
+lightrag.delete_by_entity("Paris")
 
-#### Get Relationship Information
-
-```python
-relation_info = asyncio.run(lightrag.get_relation_info("Entity1", "Entity2", include_vector_data=True))
-print(relation_info)
-```
-
-## Practical Examples
-
-To better understand LightRAG's capabilities, let's explore some practical use cases.
-
-### Example 1: Inserting Multiple Documents, Querying, and Deleting
-
-**Objective:** Insert multiple documents, perform queries on specific documents, and delete selected documents.
-
-**Context:** This example demonstrates how to handle multiple documents efficiently using LightRAG, perform targeted queries, and manage document lifecycle by deleting specific entries.
-
-#### Step-by-Step Guide:
-
-1. **Install and Import `nest_asyncio`:**
-
-   Ensure `nest_asyncio` is installed. If not, install it using pip:
-
-   ```bash
-   pip install nest_asyncio
-   ```
-
-2. **Apply `nest_asyncio`:**
-
-   Apply the patch to allow nested event loops, which is essential in environments like Kaggle notebooks that already run an event loop.
-
-   ```python
-   import nest_asyncio
-   import asyncio
-   from lightrag import LightRAG
-
-   # Apply the nest_asyncio patch
-   nest_asyncio.apply()
-   ```
-
-3. **Initialize LightRAG and Insert Multiple Documents:**
-
-   ```python
-   # Initialize LightRAG
-   lightrag = LightRAG()
-
-   # Insert multiple documents
-   documents = [
-       "Artificial Intelligence is transforming the healthcare industry by enabling predictive analytics and personalized medicine.",
-       "Machine Learning enables computers to learn from data without being explicitly programmed.",
-       "Deep Learning techniques are widely used in image and speech recognition.",
-       "Natural Language Processing enables machines to understand human language."
-   ]
-
-   # Insert documents asynchronously
-   async def insert_multiple_docs():
-       await lightrag.ainsert(documents)
-
-   asyncio.get_event_loop().run_until_complete(insert_multiple_docs())
-   ```
-
-4. **Perform Queries on Specific Documents:**
-
-   ```python
-   # Define the asynchronous query function
-   async def query_documents():
-       queries = [
-           "How is AI transforming healthcare?",
-           "What does Machine Learning enable?",
-           "Explain the applications of Deep Learning."
-       ]
-
-       for query in queries:
-           response = await lightrag.aquery(query)
-           print(f"Query: {query}\nResponse: {response}\n")
-
-   # Run the asynchronous query function
-   asyncio.get_event_loop().run_until_complete(query_documents())
-   ```
-
-   **Expected Output:**
-   ```
-   Query: How is AI transforming healthcare?
-   Response: AI is transforming healthcare by enabling predictive analytics, personalized medicine, and improving diagnostic accuracy.
-
-   Query: What does Machine Learning enable?
-   Response: Machine Learning enables computers to learn from data without explicit programming, facilitating automation and intelligent decision-making.
-
-   Query: Explain the applications of Deep Learning.
-   Response: Deep Learning is applied in various fields such as image recognition, speech recognition, and natural language processing, enhancing machine understanding and interaction capabilities.
-   ```
-
-5. **Delete Selected Documents:**
-
-   Suppose you want to delete the second document ("Machine Learning enables computers to learn from data without being explicitly programmed.") after reviewing its relevance.
-
-   ```python
-   # Assume we have the document ID (doc_id) for the second document
-   # In practice, you might retrieve this ID from the insertion response or storage
-   # For demonstration, we'll compute it using the same hashing function
-
-   from lightrag.utils import compute_mdhash_id
-
-   # Compute the document ID
-   doc_content = "Machine Learning enables computers to learn from data without being explicitly programmed."
-   doc_id = compute_mdhash_id(doc_content, prefix="doc-")
-
-   # Delete the document by its ID
-   async def delete_document():
-       await lightrag.adelete_by_doc_id(doc_id)
-       print(f"Document with ID {doc_id} has been deleted.")
-
-   asyncio.get_event_loop().run_until_complete(delete_document())
-   ```
-
-   **Expected Output:**
-   ```
-   Document with ID doc-<hash_value> has been deleted.
-   ```
-
-6. **Verify Deletion:**
-
-   Attempt to query the deleted document to ensure it has been removed.
-
-   ```python
-   async def verify_deletion():
-       query = "What does Machine Learning enable?"
-       response = await lightrag.aquery(query)
-       print(f"Post-deletion Query Response: {response}")
-
-   asyncio.get_event_loop().run_until_complete(verify_deletion())
-   ```
-
-   **Expected Output:**
-   ```
-   Post-deletion Query Response: [No relevant information found or a default response indicating the document has been deleted.]
-   ```
-
-   *Note: The actual response may vary based on LightRAG's implementation of query handling for deleted documents.*
-
-#### Complete Example Code:
-
-```python
-import nest_asyncio
+# Asynchronous deletion
 import asyncio
-from lightrag import LightRAG
-from lightrag.utils import compute_mdhash_id
 
-# Apply the nest_asyncio patch
-nest_asyncio.apply()
+async def delete_entity():
+    await lightrag.adelete_by_entity("Paris")
 
-# Initialize LightRAG
-lightrag = LightRAG()
+asyncio.run(delete_entity())
+```
 
-# Insert multiple documents
-documents = [
-    "Artificial Intelligence is transforming the healthcare industry by enabling predictive analytics and personalized medicine.",
-    "Machine Learning enables computers to learn from data without being explicitly programmed.",
-    "Deep Learning techniques are widely used in image and speech recognition.",
-    "Natural Language Processing enables machines to understand human language."
-]
+#### `get_entity_info`
 
-# Insert documents asynchronously
-async def insert_multiple_docs():
-    await lightrag.ainsert(documents)
-    print("Inserted multiple documents.")
+Retrieves detailed information about a specific entity, including its relationships and, optionally, vector data.
 
-asyncio.get_event_loop().run_until_complete(insert_multiple_docs())
+```python
+# Asynchronous retrieval
+async def fetch_entity_info():
+    info = await lightrag.get_entity_info("Paris", include_vector_data=True)
+    print(info)
 
-# Perform queries on specific documents
-async def query_documents():
-    queries = [
-        "How is AI transforming healthcare?",
-        "What does Machine Learning enable?",
-        "Explain the applications of Deep Learning."
-    ]
+asyncio.run(fetch_entity_info())
+```
 
-    for query in queries:
-        response = await lightrag.aquery(query)
-        print(f"Query: {query}\nResponse: {response}\n")
+#### `get_relation_info`
 
-asyncio.get_event_loop().run_until_complete(query_documents())
+Fetches detailed information about a specific relationship between two entities.
 
-# Delete the second document
-doc_content = "Machine Learning enables computers to learn from data without being explicitly programmed."
-doc_id = compute_mdhash_id(doc_content, prefix="doc-")
+```python
+# Asynchronous retrieval
+async def fetch_relation_info():
+    relation = await lightrag.get_relation_info("Paris", "France", include_vector_data=False)
+    print(relation)
+
+asyncio.run(fetch_relation_info())
+```
+
+### Managing Documents
+
+Managing documents is crucial for maintaining an up-to-date and relevant knowledge base. LightRAG provides methods to delete documents and ensure associated data is consistently managed.
+
+#### `delete_by_doc_id`
+
+Deletes a document and all its related data from the system, ensuring that entities and relationships associated with the document are appropriately handled.
+
+```python
+# Synchronous deletion by document ID
+doc_id = "doc-1234567890abcdef"
+lightrag.delete_by_doc_id(doc_id)
+
+# Asynchronous deletion
+import asyncio
 
 async def delete_document():
     await lightrag.adelete_by_doc_id(doc_id)
-    print(f"Document with ID {doc_id} has been deleted.")
 
-asyncio.get_event_loop().run_until_complete(delete_document())
-
-# Verify deletion
-async def verify_deletion():
-    query = "What does Machine Learning enable?"
-    response = await lightrag.aquery(query)
-    print(f"Post-deletion Query Response: {response}")
-
-asyncio.get_event_loop().run_until_complete(verify_deletion())
+asyncio.run(delete_document())
 ```
 
-**Output:**
+### Additional Utilities
+
+LightRAG also provides utility methods to interact with and retrieve metadata from the underlying knowledge graph.
+
+#### `get_graph_labels`
+
+Retrieves all labels (nodes) present in the knowledge graph.
+
+```python
+# Asynchronous retrieval
+async def fetch_graph_labels():
+    labels = await lightrag.get_graph_labels()
+    print(labels)
+
+asyncio.run(fetch_graph_labels())
 ```
-Inserted multiple documents.
-Query: How is AI transforming healthcare?
-Response: AI is transforming healthcare by enabling predictive analytics, personalized medicine, and improving diagnostic accuracy.
 
-Query: What does Machine Learning enable?
-Response: Machine Learning enables computers to learn from data without explicit programming, facilitating automation and intelligent decision-making.
+#### `get_graps`
 
-Query: Explain the applications of Deep Learning.
-Response: Deep Learning is applied in various fields such as image recognition, speech recognition, and natural language processing, enhancing machine understanding and interaction capabilities.
+Fetches the knowledge graph starting from a specific node up to a defined depth.
 
-Document with ID doc-<hash_value> has been deleted.
-Post-deletion Query Response: [No relevant information found or a default response indicating the document has been deleted.]
+```python
+# Asynchronous retrieval
+async def fetch_graph():
+    graph = await lightrag.get_graps(nodel_label="France", max_depth=2)
+    print(graph)
+
+asyncio.run(fetch_graph())
 ```
 
-### Example 2: Custom Chunk Insertion
+## Getting Started: Installation and Setup
 
-**Objective:** Insert custom text chunks associated with a full document.
+Before diving into using LightRAG, ensure you have the necessary dependencies and configurations set up.
+
+1. **Installation**: LightRAG can be installed via `pip`. Ensure you have Python 3.7 or higher.
+
+    ```bash
+    pip install lightrag
+    ```
+
+2. **Dependencies**: LightRAG relies on various storage backends and LLMs. Install the required packages based on your chosen storage solutions.
+
+    ```bash
+    pip install networkx neo4j pymongo redis
+    ```
+
+3. **Configuration**: Initialize LightRAG with appropriate configurations, specifying storage types, LLM functions, and embedding functions.
+
+    ```python
+    from lightrag import LightRAG
+
+    def your_llm_function(query, system_prompt, stream):
+        # Define your LLM interaction here
+        pass
+
+    def your_embedding_function(text):
+        # Define your embedding function here
+        pass
+
+    lightrag = LightRAG(
+        llm_model_func=your_llm_function,
+        embedding_func=your_embedding_function,
+        # Add other configurations as needed
+    )
+    ```
+
+---
+
+## Practical Examples
+
+To better understand how to utilize LightRAG, let's explore a series of practical examples that demonstrate common use cases. Each example includes a title, a concise description, and corresponding code snippets to guide you through the implementation process.
+
+### Example 1: Initializing LightRAG
+
+Initialize LightRAG with default and custom configurations, including defining your language model function and embedding function.
 
 ```python
 from lightrag import LightRAG
 
-# Initialize LightRAG
-lightrag = LightRAG()
+# Define your LLM and embedding functions
+def mock_llm_function(query, system_prompt, stream):
+    return f"Mock response for query: {query}"
 
-# Full document text
-full_text = "Machine Learning enables computers to learn from data without being explicitly programmed."
+def mock_embedding_function(text):
+    return [0.1, 0.2, 0.3]  # Example embedding vector
 
-# Custom chunks
-text_chunks = [
-    "Machine Learning enables computers to learn from data.",
-    "It does so without being explicitly programmed."
-]
+# Initialize LightRAG with default settings
+lightrag_default = LightRAG()
 
-# Insert custom chunks
-lightrag.insert_custom_chunks(full_text, text_chunks)
+# Initialize LightRAG with custom settings
+custom_config = {
+    "working_dir": "./custom_cache",            # Directory for caching and logs
+    
+    # Configuration for embedding cache (useful for optimizing redundant computations)
+    "embedding_cache_config": {
+        "enabled": True,                        # Enable embedding caching
+        "similarity_threshold": 0.9,            # Threshold for considering embeddings similar
+        "use_llm_check": True,                  # Use LLM verification for embeddings
+    },
 
-# Perform a query
-query = "What does Machine Learning enable?"
-response = lightrag.query(query)
-print("Query Response:", response)
+    # Storage configurations (choose appropriate backends for your use case)
+    "kv_storage": "RedisKVStorage",             # Key-value storage for caching responses
+    "vector_storage": "MilvusVectorDBStorage",  # Vector database for embedding storage
+    "graph_storage": "Neo4JStorage",            # Graph storage for knowledge representation
+
+    # Model function configurations (define your LLM and embedding functions)
+    "llm_model_func": mock_llm_function,        # Your custom LLM function for text generation
+    "embedding_func": mock_embedding_function,  # Your custom embedding function
+
+    # LLM model settings
+    "llm_model_name": "custom-llm-model",       # Define the LLM model to use
+    "llm_model_kwargs": {                       # Additional parameters for LLM behavior
+        "temperature": 0.0                      # Controls randomness of LLM output (0.0 means deterministic output)
+    },
+
+    "log_level": "INFO"                         # Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+}
+
+lightrag_custom = LightRAG(**custom_config)
 ```
 
-**Output:**
-```
-Query Response: Machine Learning enables computers to learn from data without explicit programming, facilitating automation and intelligent decision-making.
-```
+### Example 2: Inserting Documents
 
-### Example 3: Advanced Query with Keyword Extraction
-
-**Objective:** Utilize LightRAG's keyword extraction to enhance query responses, especially within notebook environments like Kaggle.
-
-**Context:** Notebook environments such as Kaggle often run an existing event loop, which can conflict with `asyncio.run`. To seamlessly integrate asynchronous operations in such environments, we use `nest_asyncio`.
-
-#### Step-by-Step Guide:
-
-1. **Install and Import `nest_asyncio`:**
-
-   Ensure `nest_asyncio` is installed. If not, install it using pip:
-
-   ```bash
-   pip install nest_asyncio
-   ```
-
-2. **Apply `nest_asyncio`:**
-
-   Apply the patch to allow nested event loops.
-
-   ```python
-   import nest_asyncio
-   import asyncio
-   from lightrag import LightRAG
-
-   # Apply the nest_asyncio patch
-   nest_asyncio.apply()
-   ```
-
-3. **Initialize LightRAG and Insert Documents:**
-
-   ```python
-   # Initialize LightRAG
-   lightrag = LightRAG()
-
-   # Insert documents
-   documents = [
-       "Deep Learning techniques are widely used in image and speech recognition.",
-       "Natural Language Processing enables machines to understand human language."
-   ]
-   lightrag.insert(documents)
-   ```
-
-4. **Define and Run the Asynchronous Query Function:**
-
-   ```python
-   async def advanced_query():
-       # Define a query with a prompt
-       query = "Explain the applications of Deep Learning."
-       prompt = "Provide a detailed explanation based on the following keywords."
-
-       # Perform a query with separate keyword extraction
-       response = await lightrag.aquery_with_separate_keyword_extraction(query, prompt)
-       print("Advanced Query Response:", response)
-
-   # Run the asynchronous query
-   asyncio.get_event_loop().run_until_complete(advanced_query())
-   ```
-
-**Complete Example Code:**
+Insert single or multiple documents into LightRAG. This process includes deduplication, chunking, and initial processing to prepare the documents for efficient retrieval and analysis.
 
 ```python
-import nest_asyncio
-import asyncio
-from lightrag import LightRAG
+# Insert a single document
+lightrag.insert("LightRAG is a retrieval-augmented generation framework.")
 
-# Apply the nest_asyncio patch
-nest_asyncio.apply()
-
-# Initialize LightRAG
-lightrag = LightRAG()
-
-# Insert documents
+# Insert multiple documents
 documents = [
-    "Deep Learning techniques are widely used in image and speech recognition.",
-    "Natural Language Processing enables machines to understand human language."
+    "LightRAG integrates LLMs with knowledge graphs.",
+    "It supports various storage backends.",
+    "Asynchronous operations enhance performance."
 ]
 lightrag.insert(documents)
-
-# Define the asynchronous query function
-async def advanced_query():
-    # Define a query with a prompt
-    query = "Explain the applications of Deep Learning."
-    prompt = "Provide a detailed explanation based on the following keywords."
-
-    # Perform a query with separate keyword extraction
-    response = await lightrag.aquery_with_separate_keyword_extraction(query, prompt)
-    print("Advanced Query Response:", response)
-
-# Run the asynchronous query
-asyncio.get_event_loop().run_until_complete(advanced_query())
 ```
 
-**Output:**
+### Example 3: Inserting Custom Knowledge Graphs
+
+Enrich LightRAG's knowledge base by inserting custom knowledge graphs. Define entities, their relationships, and associate them with specific document chunks to create a structured understanding of the data.
+
+```python
+# Custom Knowledge Graph
+custom_kg = {
+    "chunks": [
+        {"content": "Chunk content 1", "source_id": "doc-1"},
+        {"content": "Chunk content 2", "source_id": "doc-2"}
+    ],
+    "entities": [
+        {"entity_name": "Entity1", "entity_type": "TypeA", "description": "Description of Entity1", "source_id": "doc-1"},
+        {"entity_name": "Entity2", "entity_type": "TypeB", "description": "Description of Entity2", "source_id": "doc-2"}
+    ],
+    "relationships": [
+        {"src_id": "Entity1", "tgt_id": "Entity2", "description": "Relationship description", "keywords": "keyword1, keyword2", "weight": 1.0, "source_id": "doc-1"}
+    ]
+}
+
+# Insert custom knowledge graph
+lightrag.insert_custom_kg(custom_kg)
 ```
-Advanced Query Response: Deep Learning is applied in various fields such as image recognition, speech recognition, and natural language processing, enhancing machine understanding and interaction capabilities.
+
+### Example 4: Inserting Images with Custom Knowledge
+
+Integrate images into LightRAG by inserting them along with their associated metadata and relationships. This enhances the system's ability to understand and retrieve visual information alongside textual data.
+
+```python
+# Custom Knowledge Graph with Images
+custom_kg_images = {
+    "chunks": [
+        {"content": "Image description for sunset.jpg", "source_id": "doc-img-1"},
+        {"content": "Image description for mountain.jpg", "source_id": "doc-img-2"}
+    ],
+    "entities": [
+        {"entity_name": "SunsetImage", "entity_type": "Image", "description": "A beautiful sunset over the ocean.", "source_id": "doc-img-1"},
+        {"entity_name": "MountainImage", "entity_type": "Image", "description": "A majestic mountain range during sunrise.", "source_id": "doc-img-2"}
+    ],
+    "relationships": [
+        {"src_id": "SunsetImage", "tgt_id": "MountainImage", "description": "Both images depict natural landscapes.", "keywords": "nature, landscape", "weight": 1.0, "source_id": "doc-img-1"}
+    ]
+}
+
+# Insert images with custom knowledge
+lightrag.insert_custom_kg(custom_kg_images)
 ```
 
-**Explanation:**
+### Example 5: Inserting Charts (Images) with Custom Knowledge
 
-- **`nest_asyncio.apply()`**: This line patches the existing event loop to allow nested asynchronous operations, which is essential in environments like Kaggle notebooks that already run an event loop.
+Enhance your knowledge base by inserting charts as images along with their contextual information. This allows LightRAG to understand and retrieve graphical data effectively, supporting data-driven applications.
 
-- **Asynchronous Function (`advanced_query`)**: Defines an asynchronous function to perform the advanced query using LightRAG's keyword extraction feature.
+```python
+# Custom Knowledge Graph with Charts
+custom_kg_charts = {
+    "chunks": [
+        {"content": "Chart description for revenue_growth.png", "source_id": "doc-chart-1"},
+        {"content": "Chart description for customer_retention.png", "source_id": "doc-chart-2"}
+    ],
+    "entities": [
+        {"entity_name": "RevenueGrowthChart", "entity_type": "Chart", "description": "Quarterly revenue growth analysis.", "source_id": "doc-chart-1"},
+        {"entity_name": "CustomerRetentionChart", "entity_type": "Chart", "description": "Customer retention rates over the past year.", "source_id": "doc-chart-2"}
+    ],
+    "relationships": [
+        {"src_id": "RevenueGrowthChart", "tgt_id": "CustomerRetentionChart", "description": "Revenue growth impacts customer retention.", "keywords": "impact, retention", "weight": 0.85, "source_id": "doc-chart-1"}
+    ]
+}
 
-- **Running the Asynchronous Function**: Instead of using `asyncio.run()`, which can conflict with existing event loops in notebooks, we use `asyncio.get_event_loop().run_until_complete()` to execute the asynchronous function seamlessly.
+# Insert charts with custom knowledge
+lightrag.insert_custom_kg(custom_kg_charts)
+```
 
-## Best Practices
+### Example 6: Performing a Query
 
-- **Batch Processing:** When inserting a large number of documents, utilize batch insertion to optimize performance.
-  
-- **Asynchronous Operations:** Leverage asynchronous methods (`ainsert`, `aquery`) to prevent blocking, especially in applications requiring high responsiveness.
-  
-- **Handling Asynchronous Operations in Notebooks:** Use `nest_asyncio` to enable seamless execution of asynchronous code within notebook environments like Kaggle.
-  
-- **Error Handling:** Implement robust error handling when performing insertions and deletions to ensure data integrity.
-  
-- **Configuration Management:** Customize LightRAG's configurations to align with your specific storage backends and performance requirements.
-  
-- **Logging:** Monitor LightRAG's operations through its logging mechanism to track processing status and debug issues effectively.
+Utilize LightRAG's powerful querying capabilities to retrieve information based on natural language queries. This example demonstrates both synchronous and asynchronous querying methods.
+
+```python
+# Perform a synchronous query
+response = lightrag.query("How does LightRAG improve information retrieval?")
+print(response)
+
+# Perform an asynchronous query
+import asyncio
+
+async def async_query():
+    response = await lightrag.aquery("Explain the benefits of using LightRAG.")
+    print(response)
+
+asyncio.run(async_query())
+```
+
+### Example 7: Deleting Entities and Documents
+
+Maintain the integrity of your knowledge base by deleting entities and documents. This ensures that outdated or incorrect information is removed, keeping the system up-to-date.
+
+```python
+# Delete an entity and its relationships
+lightrag.delete_by_entity("Entity1")
+
+# Delete a document by its ID
+doc_id = "doc-1234567890abcdef"
+lightrag.delete_by_doc_id(doc_id)
+
+# Asynchronous deletion
+import asyncio
+
+async def delete_entities_and_docs():
+    await lightrag.adelete_by_entity("Entity2")
+    await lightrag.adelete_by_doc_id(doc_id)
+
+asyncio.run(delete_entities_and_docs())
+```
+
+---
+
+## Advanced Usage
+
+For users seeking to leverage the full capabilities of LightRAG, advanced methods and configurations are available.
+
+### Customizing Prompt Templates
+
+LightRAG allows the customization of prompt templates to tailor responses according to specific requirements.
+
+```python
+custom_prompt = "Based on the provided context, answer the following question:\n\n{context_data}\n\nQuestion: {response_type}\nHistory: {history}\n\nAnswer:"
+
+response = lightrag.query(
+    query="What are the applications of LightRAG in data science?",
+    prompt=custom_prompt,
+    param=QueryParam(response_type="data science applications")
+)
+print(response)
+```
+
+### Managing Document Status
+
+LightRAG provides methods to monitor and manage the processing status of documents.
+
+```python
+# Get processing status
+async def fetch_status():
+    status = await lightrag.get_processing_status()
+    print(status)
+
+asyncio.run(fetch_status())
+```
+
+### Deleting Documents by ID
+
+Remove specific documents and their associated data from LightRAG.
+
+```python
+# Synchronous deletion by document ID
+doc_id = "doc-1234567890abcdef"
+lightrag.delete_by_doc_id(doc_id)
+
+# Asynchronous deletion
+import asyncio
+
+async def delete_document():
+    await lightrag.adelete_by_doc_id(doc_id)
+
+asyncio.run(delete_document())
+```
 
 ## Conclusion
 
-LightRAG stands out as a comprehensive tool for managing and querying large document collections. Its flexible public interface, combined with powerful features like entity extraction and knowledge graph integration, makes it an invaluable asset for developers and data scientists alike. By following the guidelines and examples provided in this article, you can effectively integrate LightRAG into your projects, harnessing its full potential to drive intelligent data management and retrieval.
+LightRAG stands as a versatile and efficient framework, seamlessly integrating large language models with structured knowledge bases. Its comprehensive public interface, coupled with robust features like asynchronous operations, flexible storage options, and intelligent querying, makes it an indispensable tool for developers and data scientists alike. By leveraging LightRAG, users can enhance their data retrieval processes, ensuring accuracy, scalability, and depth in information analysis.
 
-Whether you're building sophisticated AI models, developing knowledge bases, or conducting in-depth research, LightRAG provides the robust infrastructure needed to manage and utilize your data efficiently. Embrace LightRAG and elevate your data handling capabilities to new heights.
+## References
 
+- [LightRAG Documentation](https://github.com/HKUDS/LightRAG)
+- [Asyncio in Python](https://docs.python.org/3/library/asyncio.html)
+- [Knowledge Graphs Explained](https://en.wikipedia.org/wiki/Knowledge_graph)
+- [Retrieval-Augmented Generation](https://arxiv.org/abs/2005.11401)
