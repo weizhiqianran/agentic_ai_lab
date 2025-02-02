@@ -1,4 +1,4 @@
-# Mastering `fastapi.WebSocket`: A Comprehensive Guide with Standalone Examples
+# Building Real-Time Applications with FastAPI: A WebSocket Tutorial
 
 WebSockets enable real-time, bidirectional communication between a client and a server. FastAPI, a modern, high-performance web framework for Python 3.6+ based on standard type hints, provides robust support for WebSocket endpoints. In this guide, every example is self-contained, so you can experiment with each one independently.
 
@@ -10,21 +10,23 @@ WebSockets enable real-time, bidirectional communication between a client and a 
 4. [Example 2: Chat Room with Broadcasting](#example-2-chat-room-with-broadcasting)
 5. [Example 3: Securing WebSocket Connections](#example-3-securing-websocket-connections)
 6. [Example 4: Streaming Response with WebSocket](#example-4-streaming-response-with-websocket)
-7. [Example 5: Detailed Method Usage Examples](#example-5-detailed-method-usage-examples)
-    - [5.1 Text Data: `receive_text()` and `send_text()`](#51-text-data-receive_text-and-send_text)
-    - [5.2 Bytes Data: `receive_bytes()` and `send_bytes()`](#52-bytes-data-receive_bytes-and-send_bytes)
-    - [5.3 JSON Data: `receive_json()` and `send_json()`](#53-json-data-receive_json-and-send_json)
-    - [5.4 Low-Level Methods: `receive()` and `send()`](#54-low-level-methods-receive-and-send)
-8. [HTTP vs. WebSocket Endpoints](#http-vs-websocket-endpoints)
-9. [Best Practices and Tips](#best-practices-and-tips)
-10. [Conclusion](#conclusion)
-11. [References](#references)
+7. [Example 5: Real-Time Chat Room](#example-5-real-time-chat-room)
+8. [Example 6: Secure Notifications System](#example-6-secure-notifications-system)
+9. [Example 7: Live Data Streaming](#example-7-live-data-streaming)
+10. [HTTP vs. WebSocket Endpoints](#http-vs-websocket-endpoints)
+11. [Best Practices and Tips](#best-practices-and-tips)
+12. [Conclusion](#conclusion)
+13. [References](#references)
+
+---
 
 ## Introduction
 
 WebSockets allow persistent, bidirectional communication between clients and servers. Unlike traditional HTTP—where each request gets a new connection—WebSockets keep the connection open until it is explicitly closed. This makes them ideal for real-time applications such as chats, live notifications, and streaming data.
 
 FastAPI’s built-in support for WebSockets makes it simple to create these applications using Python’s async features.
+
+---
 
 ## How to Run the Server
 
@@ -50,15 +52,17 @@ This simple example receives text messages and sends them back prefixed with `"E
 ```python
 from fastapi import FastAPI, WebSocket
 
+# Create a FastAPI application instance.
 app = FastAPI()
 
 @app.websocket("/ws/echo")
 async def websocket_echo(websocket: WebSocket):
+    # Accept the WebSocket connection from the client.
     await websocket.accept()
     while True:
-        # Receive a text message from the client
+        # Receive a text message from the client.
         data = await websocket.receive_text()
-        # Send the text message back with an "Echo:" prefix
+        # Send the received message back to the client with an "Echo:" prefix.
         await websocket.send_text(f"Echo: {data}")
 
 # To run: uvicorn echo_server:app --reload
@@ -71,9 +75,12 @@ import asyncio
 import websockets
 
 async def echo_client():
+    # Define the WebSocket server URI.
     uri = "ws://localhost:8000/ws/echo"
     async with websockets.connect(uri) as websocket:
+        # Send a message to the server.
         await websocket.send("Hello, FastAPI!")
+        # Receive the echoed response from the server.
         response = await websocket.recv()
         print(f"Response received: {response}")
 
@@ -92,34 +99,44 @@ This standalone example demonstrates a chat server where every connected client 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from typing import List
 
+# Create a FastAPI application instance.
 app = FastAPI()
 
+# Define a connection manager to handle active WebSocket connections.
 class ConnectionManager:
     def __init__(self):
+        # List to store active WebSocket connections.
         self.active_connections: List[WebSocket] = []
     
     async def connect(self, websocket: WebSocket):
+        # Accept a new WebSocket connection and add it to the active connections list.
         await websocket.accept()
         self.active_connections.append(websocket)
     
     def disconnect(self, websocket: WebSocket):
+        # Remove a WebSocket connection from the active connections list.
         self.active_connections.remove(websocket)
     
     async def broadcast(self, message: str):
+        # Send a message to all active WebSocket connections.
         for connection in self.active_connections:
             await connection.send_text(message)
 
+# Create an instance of the ConnectionManager.
 manager = ConnectionManager()
 
 @app.websocket("/ws/chat")
 async def chat_endpoint(websocket: WebSocket):
+    # Connect the client to the chat room.
     await manager.connect(websocket)
     try:
         while True:
-            # Receive a message and broadcast it to all clients
+            # Receive a message from the client.
             data = await websocket.receive_text()
+            # Broadcast the received message to all connected clients.
             await manager.broadcast(f"Client says: {data}")
     except WebSocketDisconnect:
+        # Handle client disconnection and notify other clients.
         manager.disconnect(websocket)
         await manager.broadcast("A client left the chat")
 
@@ -137,28 +154,37 @@ This example accepts a connection only if a valid token is provided as a query p
 ```python
 from fastapi import FastAPI, WebSocket, Query, HTTPException, WebSocketDisconnect
 
+# Create a FastAPI application instance.
 app = FastAPI()
 
+# Function to validate the token provided by the client.
 async def get_current_user(token: str = Query(...)):
     if token != "secret-token":
+        # Raise an HTTPException if the token is invalid.
         raise HTTPException(status_code=400, detail="Invalid token")
     return {"user": "authenticated_user"}
 
 @app.websocket("/ws/secure")
 async def secure_endpoint(websocket: WebSocket, token: str = Query(...)):
     try:
+        # Validate the token before accepting the connection.
         user = await get_current_user(token)
     except HTTPException:
+        # Close the connection if the token is invalid.
         await websocket.close(code=1008)  # Policy Violation
         return
 
+    # Accept the WebSocket connection.
     await websocket.accept()
+    # Send a welcome message to the authenticated client.
     await websocket.send_text(f"Hello, {user['user']}! Welcome to the secure WebSocket.")
     try:
         while True:
+            # Receive a message from the client and echo it back.
             data = await websocket.receive_text()
             await websocket.send_text(f"You said: {data}")
     except WebSocketDisconnect:
+        # Handle client disconnection.
         print("Client disconnected")
 
 # To run: uvicorn secure_server:app --reload
@@ -176,18 +202,23 @@ This server sends a series of messages (one per second) to the client, simulatin
 import asyncio
 from fastapi import FastAPI, WebSocket
 
+# Create a FastAPI application instance.
 app = FastAPI()
 
 @app.websocket("/ws/stream")
 async def stream(websocket: WebSocket):
+    # Accept the WebSocket connection.
     await websocket.accept()
     try:
+        # Simulate a streaming response by sending 10 messages with a 1-second delay.
         for i in range(10):
             await websocket.send_text(f"Streaming message {i+1}")
             await asyncio.sleep(1)
     except Exception as e:
+        # Handle any errors during streaming.
         print("Error during streaming:", e)
     finally:
+        # Close the WebSocket connection after streaming is complete.
         await websocket.close()
 
 # To run: uvicorn stream_server:app --reload
@@ -200,13 +231,16 @@ import asyncio
 import websockets
 
 async def stream_client():
+    # Define the WebSocket server URI.
     uri = "ws://localhost:8000/ws/stream"
     async with websockets.connect(uri) as websocket:
         try:
             while True:
+                # Receive streaming messages from the server.
                 message = await websocket.recv()
                 print(f"Streamed response: {message}")
         except websockets.exceptions.ConnectionClosed:
+            # Handle the end of the stream.
             print("Stream ended.")
 
 asyncio.run(stream_client())
@@ -214,159 +248,123 @@ asyncio.run(stream_client())
 
 ---
 
-## Example 5: Detailed Method Usage Examples
+## Example 5: Real-Time Chat Room
 
-Each of the following examples is a standalone script demonstrating specific WebSocket methods.
+This example is similar to the chat room example but uses a distinct endpoint and file name for differentiation.
 
-### 5.1 Text Data: `receive_text()` and `send_text()`
-
-**File:** `methods_text_server.py`
+**File:** `chat_server_additional.py`
 
 ```python
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from typing import List
 
+# Create a FastAPI application instance.
 app = FastAPI()
 
-@app.websocket("/ws/methods_text")
-async def methods_text(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        message = await websocket.receive_text()
-        print("Received text:", message)
-        await websocket.send_text(f"Server received: {message}")
+# Define a connection manager to handle active WebSocket connections.
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+    
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+    
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+    
+    async def broadcast(self, message: str):
+        for connection in self.active_connections:
+            await connection.send_text(message)
 
-# To run: uvicorn methods_text_server:app --reload
-```
+manager = ConnectionManager()
 
-**Client Example (Optional):**
+@app.websocket("/ws/chat_additional")
+async def chat_endpoint_additional(websocket: WebSocket):
+    # Connect the client to the chat room.
+    await manager.connect(websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await manager.broadcast(f"(Additional) Client says: {data}")
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        await manager.broadcast("(Additional) A client left the chat.")
 
-```python
-import asyncio
-import websockets
-
-async def text_client():
-    uri = "ws://localhost:8000/ws/methods_text"
-    async with websockets.connect(uri) as websocket:
-        await websocket.send("Hello, text endpoint!")
-        response = await websocket.recv()
-        print("Text endpoint response:", response)
-
-asyncio.run(text_client())
+# To run: uvicorn chat_server_additional:app --reload
 ```
 
 ---
 
-### 5.2 Bytes Data: `receive_bytes()` and `send_bytes()`
+## Example 6: Secure Notifications System
 
-**File:** `methods_bytes_server.py`
+This example secures a WebSocket endpoint for sending notifications only to authenticated clients. Note the endpoint is `/ws/notify` and the file name is different.
+
+**File:** `secure_notifications.py`
 
 ```python
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, Query, HTTPException, WebSocketDisconnect
 
+# Create a FastAPI application instance.
 app = FastAPI()
 
-@app.websocket("/ws/methods_bytes")
-async def methods_bytes(websocket: WebSocket):
+# Function to verify the token.
+async def get_current_user(token: str = Query(...)):
+    if token != "secret-token":
+        raise HTTPException(status_code=400, detail="Invalid token")
+    return {"user": "authenticated_user"}
+
+@app.websocket("/ws/notify")
+async def secure_notify(websocket: WebSocket, token: str = Query(...)):
+    try:
+        user = await get_current_user(token)
+    except HTTPException:
+        await websocket.close(code=1008)  # Close connection due to policy violation.
+        return
+
     await websocket.accept()
-    while True:
-        data = await websocket.receive_bytes()
-        print("Received bytes:", data)
-        await websocket.send_bytes(b"Server received: " + data)
+    await websocket.send_text(f"Hello, {user['user']}! You are now connected to secure notifications.")
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Notification received: {data}")
+    except WebSocketDisconnect:
+        print("Client disconnected from secure notifications.")
 
-# To run: uvicorn methods_bytes_server:app --reload
-```
-
-**Client Example (Optional):**
-
-```python
-import asyncio
-import websockets
-
-async def bytes_client():
-    uri = "ws://localhost:8000/ws/methods_bytes"
-    async with websockets.connect(uri) as websocket:
-        await websocket.send(b"Hello, bytes endpoint!")
-        response = await websocket.recv()
-        print("Bytes endpoint response:", response)
-
-asyncio.run(bytes_client())
+# To run: uvicorn secure_notifications:app --reload
 ```
 
 ---
 
-### 5.3 JSON Data: `receive_json()` and `send_json()`
+## Example 7: Live Data Streaming
 
-**File:** `methods_json_server.py`
+This example simulates live data streaming (such as progress updates) by sending periodic progress messages.
 
-```python
-from fastapi import FastAPI, WebSocket
-
-app = FastAPI()
-
-@app.websocket("/ws/methods_json")
-async def methods_json(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_json()
-        print("Received JSON:", data)
-        response = {"message": "Server received your JSON", "data": data}
-        await websocket.send_json(response)
-
-# To run: uvicorn methods_json_server:app --reload
-```
-
-**Client Example (Optional):**
+**File:** `streaming_server_progress.py`
 
 ```python
 import asyncio
-import websockets
-import json
-
-async def json_client():
-    uri = "ws://localhost:8000/ws/methods_json"
-    async with websockets.connect(uri) as websocket:
-        message = {"greeting": "Hello, JSON endpoint!"}
-        await websocket.send(json.dumps(message))
-        response = await websocket.recv()
-        print("JSON endpoint response:", response)
-
-asyncio.run(json_client())
-```
-
----
-
-### 5.4 Low-Level Methods: `receive()` and `send()`
-
-This example shows how to use the lower-level methods to work with raw WebSocket messages.
-
-**File:** `methods_raw_server.py`
-
-```python
 from fastapi import FastAPI, WebSocket
 
+# Create a FastAPI application instance.
 app = FastAPI()
 
-@app.websocket("/ws/methods_raw")
-async def methods_raw(websocket: WebSocket):
+@app.websocket("/ws/stream_progress")
+async def stream_progress(websocket: WebSocket):
+    # Accept the WebSocket connection.
     await websocket.accept()
-    while True:
-        # Receive raw data (a dict containing either "text" or "bytes")
-        message = await websocket.receive()
-        print("Received raw data:", message)
-        
-        if "text" in message:
-            response = {"type": "websocket.send", "text": f"Raw echo: {message['text']}"}
-        elif "bytes" in message:
-            response = {"type": "websocket.send", "bytes": b"Raw echo: " + message["bytes"]}
-        else:
-            response = {"type": "websocket.send", "text": "Unknown message type."}
-        
-        await websocket.send(response)
+    try:
+        # Simulate progress updates for 10 seconds.
+        for i in range(10):
+            await websocket.send_text(f"Progress update: {(i+1)*10}% complete")
+            await asyncio.sleep(1)
+    except Exception as e:
+        print("Streaming error:", e)
+    finally:
+        await websocket.close()
 
-# To run: uvicorn methods_raw_server:app --reload
+# To run: uvicorn streaming_server_progress:app --reload
 ```
-
-> **Note:** Although the low-level `receive()` and `send()` methods provide extra flexibility, the convenience methods (such as `receive_text()` and `send_text()`) are generally recommended.
 
 ---
 
@@ -376,7 +374,7 @@ async def methods_raw(websocket: WebSocket):
 |-------------------------|---------------------------------------------|-----------------------------------------------------|
 | **Protocol**            | Request/Response over HTTP                  | Full-duplex communication over TCP via WebSocket    |
 | **Connection Lifespan** | Short-lived (one request, one response)     | Long-lived (persistent connection)                |
-| **Communication Model** | Client sends a request and awaits a response| Both client and server can send messages at any time|
+| **Communication Model** | Client sends a request and awaits a response | Both client and server can send messages at any time|
 | **State Management**    | Typically stateless                         | Can maintain state for the duration of the connection|
 | **Use Cases**           | CRUD operations, REST APIs                  | Chat apps, live updates, real-time notifications    |
 
@@ -392,11 +390,13 @@ async def methods_raw(websocket: WebSocket):
 - **Error Handling:** Provide robust error handling for unexpected client behavior.
 - **Resource Cleanup:** Ensure disconnected clients are removed to prevent memory leaks.
 
+---
+
 ## Conclusion
 
 FastAPI’s WebSocket support opens the door to building real-time applications—from simple echo servers to sophisticated chat rooms and streaming endpoints. Each example in this guide is a standalone script that you can run and test independently. Save the code in individual files and run them using Uvicorn (e.g., `uvicorn filename:app --reload`). Use the provided client examples or your favorite WebSocket client to interact with these endpoints.
 
-Happy coding with FastAPI and WebSockets!
+---
 
 ## References
 
@@ -404,3 +404,4 @@ Happy coding with FastAPI and WebSockets!
 - [MDN WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
 - [Python websockets Library](https://pypi.org/project/websockets/)
 - [Introduction to WebSockets](https://www.websocket.org/aboutwebsocket.html)
+
