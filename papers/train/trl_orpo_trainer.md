@@ -3,7 +3,6 @@
 ## Table of Contents
 
 - [Introduction](#introduction)
-- [Background](#background)
 - [Understanding ORPO](#understanding-orpo)
 - [ORPO Loss Function Explanation](#orpo-loss-function-explanation)
 - [Example: ORPO Loss in Action](#example-orpo-loss-in-action)
@@ -14,20 +13,20 @@
 
 ## Introduction
 
-In the rapidly evolving field of Natural Language Processing (NLP), pre-trained language models (PLMs) have demonstrated remarkable abilities across various tasks. However, to ensure these models align with human preferences and values, additional training is often necessary. Traditional methods involve multi-stage processes that can be resource-intensive. This article explores **ORPO (Odds Ratio Preference Optimization)**, a novel approach that simplifies preference alignment by eliminating the need for a reference model.
+Pre-trained language models (PLMs) have demonstrated remarkable capabilities across a wide range of NLP tasks. However, to ensure that these models generate outputs aligned with human preferences and values, additional training is often necessary. Traditional approaches usually rely on multi-stage processes—such as performing Supervised Fine-Tuning (SFT) first and then applying separate preference alignment techniques (e.g., Direct Preference Optimization or RLHF)—which can be both resource-intensive and complex.
 
-## Background
+**ORPO (Odds Ratio Preference Optimization)** introduces a streamlined alternative by integrating preference alignment directly into the SFT phase. Instead of requiring a separate reference model or reward mechanism, ORPO augments the conventional negative log-likelihood loss with an odds ratio–based penalty that contrasts the likelihood of generating preferred (chosen) versus disfavored (rejected) responses. This single-stage approach reduces computational overhead, simplifies the training pipeline, and has been shown to achieve competitive or superior performance on benchmarks across a range of model sizes.
 
-### Pre-trained Language Models
+The table below summarizes the key differences between SFT, DPO, and ORPO:
 
-Pre-trained language models like GPT-4, Llama-2, and Mistral have shown exceptional performance in understanding and generating human-like text. These models are trained on vast amounts of data from sources such as web texts and textbooks, enabling them to perform a wide range of NLP tasks effectively.
+| **Aspect**                        | **SFT**                                          | **DPO**                                                                           | **ORPO**                                                                                      |
+|-----------------------------------|--------------------------------------------------|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| **Objective**                     | Minimizes standard NLL loss to maximize the probability of target outputs.  | Optimizes the difference in log probabilities between chosen and rejected outputs using a reference model. | Combines the standard NLL loss with an odds ratio–based penalty to gently steer the model toward preferred responses. |
+| **Reference Model**               | Not used; only the target model is fine-tuned.   | **Required:** Uses a pre-trained reference model as a baseline for alignment.     | **Not required:** Operates solely on the model being fine-tuned, reducing extra resource needs. |
+| **Preference Alignment**          | No explicit mechanism for penalizing disfavored outputs, which may lead to miscalibration. | Performs alignment in an additional stage by contrasting outputs from the active and reference models. | Integrates preference alignment into SFT itself by penalizing the likelihood of disfavored outputs via the odds ratio. |
+| **Computational Efficiency**      | Very efficient in terms of resources, but lacks explicit alignment with human preferences. | More computationally intensive due to extra forward passes and memory needed for the reference model. | More efficient than DPO, as it requires fewer forward passes and lower memory consumption by merging SFT and alignment into one step. |
 
-### Preference Alignment
-
-Despite their capabilities, PLMs can sometimes produce outputs that are harmful or unethical. To mitigate this, **preference alignment** techniques are employed. These methods adjust the model's behavior to align with human values by using techniques like:
-
-- **Reinforcement Learning with Human Feedback (RLHF)**: Models are fine-tuned using human feedback to prefer certain outputs over others.
-- **Direct Preference Optimization (DPO)**: Integrates reward modeling directly into the preference learning stage.
+**ORPO (Odds Ratio Preference Optimization)** is a technique to fine-tune language models with human preferences, combining SFT and DPO in a single stage.
 
 ---
 
