@@ -20,6 +20,10 @@ LangChain offers a powerful suite of prompt template classes to help developers 
    - [Example 3: Customer Support Chat Template](#example-3-customer-support-chat-template)
    - [Example 4: Contextual Conversation Handler](#example-4-contextual-conversation-handler)
    - [Example 5: Dynamic Survey Question Generator with Few-Shot](#example-5-dynamic-survey-question-generator-with-few-shot)
+   - [Example 6: Partial with Strings in PromptTemplate](#example-6-partial-with-strings-in-prompttemplate)
+   - [Example 7: Partial with Functions in PromptTemplate](#example-7-partial-with-functions-in-prompttemplate)
+   - [Example 8: Advanced String Prompt Composition](#example-8-advanced-string-prompt-composition)
+   - [Example 9: Chat Prompt Composition](#example-9-chat-prompt-composition)
 5. [Best Practices](#best-practices)
 6. [Conclusion](#conclusion)
 
@@ -1048,6 +1052,175 @@ Survey Questions:
 - **Dynamic Generation:**  
   - The `format()` method replaces placeholders with new input values, guiding the model to produce relevant survey questions.
   
+---
+
+### Example 6: Partial with Strings in PromptTemplate
+
+This example demonstrates how to use partial variables with constant string values in a `PromptTemplate`. Partial variables allow you to pre-fill part of the template so that you don't have to supply them every time you call `format()`.
+
+```python
+from langchain.prompts import PromptTemplate
+
+# Create a prompt template with placeholders for greeting and name.
+# Use partial_variables to pre-fill the greeting.
+template = PromptTemplate.from_template(
+    template="{greeting}, {name}! Welcome to our service.",
+    partial_variables={"greeting": "Hello"}
+)
+
+# Now only the 'name' variable needs to be provided.
+result = template.format(name="Alice")
+print(result)
+```
+
+**Output:**
+```
+Hello, Alice! Welcome to our service.
+```
+
+**Explanation:**  
+- **Pre-Filling with Partial Variables:**  
+  - The `greeting` variable is set to `"Hello"` via `partial_variables`.  
+- **Dynamic Replacement:**  
+  - The `format()` method only requires the `name` variable, reducing redundancy.  
+- **Simplified Template Usage:**  
+  - Makes it easier to reuse the template with a common greeting.
+
+---
+
+### Example 7: Partial with Functions in PromptTemplate
+
+This example shows how to use partial variables computed via functions. Here, we compute the current date and use it as a partial variable in the template.
+
+```python
+from langchain.prompts import PromptTemplate
+from datetime import datetime
+
+# Define a function to get the current date as a string.
+def get_current_date():
+    return datetime.now().strftime("%Y-%m-%d")
+
+# Create a prompt template with placeholders for date and name.
+# Use partial_variables to pre-fill the date by calling get_current_date().
+template = PromptTemplate.from_template(
+    template="Today's date is {date} and your name is {name}.",
+    partial_variables={"date": get_current_date()}
+)
+
+# Provide only the 'name' variable when formatting the prompt.
+result = template.format(name="Bob")
+print(result)
+```
+
+**Output:**
+```
+Today's date is 2025-02-19 and your name is Bob.
+```
+
+**Explanation:**  
+- **Dynamic Partial Value:**  
+  - The `get_current_date()` function computes the current date, which is used as a partial variable.  
+- **Reduced Input Requirements:**  
+  - Only the `name` variable needs to be supplied during formatting.  
+- **Reusable Template:**  
+  - Useful for automatically including dynamic content like the current date.
+
+---
+
+### Example 8: Advanced String Prompt Composition
+
+This example demonstrates how to compose multiple `PromptTemplate` instances using the `+` operator to build a more complex prompt. In this scenario, one template provides a personalized greeting with location details, while the other template adds a follow-up message including time and an activity. The composed prompt requires dynamic replacement of multiple variables.
+
+```python
+from langchain.prompts import PromptTemplate
+
+# Create the first prompt template with placeholders for name and location.
+greeting_template = PromptTemplate.from_template("Hello, {name} from {location}!")
+
+# Create the second prompt template with placeholders for time and activity.
+followup_template = PromptTemplate.from_template(" At {time}, how are you feeling today? Enjoy your {activity}.")
+
+# Combine the two templates using the + operator to form a complex prompt.
+combined_template = greeting_template + followup_template
+
+# Format the combined prompt by providing values for all placeholders.
+result = combined_template.format(
+    name="Charlie", 
+    location="New York", 
+    time="afternoon", 
+    activity="coffee"
+)
+print(result)
+```
+
+**Output:**
+```
+Hello, Charlie from New York! At afternoon, how are you feeling today? Enjoy your coffee.
+```
+
+**Explanation:**  
+- **Template Composition:**  
+  - The first template creates a personalized greeting that includes both the person's name and their location.
+  - The second template provides a follow-up message that asks about the person's well-being and suggests enjoying an activity, incorporating both time and activity details.
+- **Modularity and Reusability:**  
+  - Each prompt template is designed as a modular component that can be reused in different contexts.
+  - The `+` operator is used to seamlessly combine the two templates into one complex prompt.
+- **Dynamic Replacement:**  
+  - When formatting the combined template, all the placeholders (`{name}`, `{location}`, `{time}`, `{activity}`) are dynamically replaced with the provided values.
+- **Enhanced Complexity:**  
+  - The example shows how combining multiple templates can help construct a richer, multi-part message that addresses various aspects of a conversation or interaction.
+  
+---
+
+### Example 9: Chat Prompt Composition
+
+This example illustrates composing a chat prompt by combining two chat message templates. This can be useful when you want to merge different parts of a conversation into a single coherent chat flow.
+
+```python
+from langchain.prompts import ChatPromptTemplate
+from langchain.prompts.chat import SystemMessagePromptTemplate, HumanMessagePromptTemplate
+
+# Create a system message template to set the context.
+system_template = SystemMessagePromptTemplate.from_template(
+    "You are a virtual assistant for {company}."
+)
+
+# Create a human message template for customer queries.
+human_template = HumanMessagePromptTemplate.from_template(
+    "Customer: {question}"
+)
+
+# Combine the system and human templates into one chat prompt.
+chat_prompt = ChatPromptTemplate.from_messages([
+    system_template,
+    human_template
+])
+
+# Format the chat prompt by providing the required variables.
+messages = chat_prompt.format_messages(
+    company="Acme Corp",
+    question="What are your operating hours?"
+)
+
+# Print each message in the final chat prompt.
+for msg in messages:
+    print(f"{msg.__class__.__name__}: {msg.content}")
+```
+
+**Output:**
+```
+SystemMessage: You are a virtual assistant for Acme Corp.
+HumanMessage: Customer: What are your operating hours?
+```
+
+**Explanation:**  
+- **Chat Context Setup:**  
+  - Uses a system message to set the context and a human message for the customer's query.  
+- **Composition:**  
+  - The `ChatPromptTemplate.from_messages()` method combines different message templates into a single chat flow.  
+- **Dynamic Replacement:**  
+  - Variables like `{company}` and `{question}` are replaced with actual values during formatting.
+
 ---
 
 ## Best Practices
