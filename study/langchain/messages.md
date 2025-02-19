@@ -6,21 +6,21 @@ LangChain Messages are a key component in the LangChain framework. They serve as
 
 ### Table of Contents
 
-- [Introduction](#introduction)
-- [Attributes of Messages](#attributes-of-messages)
-  - [Comparison of Message Types](#comparison-of-message-types)
-  - [Comparison of Message Attributes](#comparison-of-message-attributes)
-- [Message Types](#message-types)
-  - [SystemMessage](#systemmessage)
-  - [HumanMessage](#humanmessage)
-  - [AIMessage](#aimessage)
-  - [AIMessageChunk](#aimessagechunk)
-  - [ToolMessage](#toolmessage)
-- [Utility Functions](#utility-functions)
-  - [trim_messages: Trimming Chat History](#trim_messages-trimming-chat-history)
-  - [filter_messages: Filtering Chat History](#filter_messages-filtering-chat-history)
-- [Best Practices](#best-practices)
-- [Conclusion](#conclusion)
+1. [Introduction](#introduction)
+2. [Attributes of Messages](#attributes-of-messages)
+   - [Comparison of Message Types](#comparison-of-message-types)
+   - [Comparison of Message Attributes](#comparison-of-message-attributes)
+3. [Message Types](#message-types)
+   - [SystemMessage](#systemmessage)
+   - [HumanMessage](#humanmessage)
+   - [AIMessage](#aimessage)
+   - [AIMessageChunk](#aimessagechunk)
+   - [ToolMessage](#toolmessage)
+4. [Utility Functions](#utility-functions)
+   - [trim_messages: Trimming Chat History](#trim_messages-trimming-chat-history)
+   - [filter_messages: Filtering Chat History](#filter_messages-filtering-chat-history)
+5. [Best Practices](#best-practices)
+6. [Conclusion](#conclusion)
 
 ---
 
