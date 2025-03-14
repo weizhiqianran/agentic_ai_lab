@@ -109,8 +109,8 @@ from langchain_openai import ChatOpenAI
 # Initialize the chat model
 # model = ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=user_secrets.get_secret("my-openai-api-key"))
 
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # Invoke the model with a string (automatically converted to HumanMessage)
 response = model.invoke("Tell me a joke about programming.")
@@ -131,8 +131,8 @@ from langchain_openai import ChatOpenAI
 
 # Initialize the chat model
 # model = ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=user_secrets.get_secret("my-openai-api-key"))
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # Create a multimodal message with text and an image URL
 multimodal_message = HumanMessage(
@@ -248,8 +248,8 @@ from langchain_openai import ChatOpenAI
 
 # Initialize the chat model
 # model = ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=user_secrets.get_secret("my-openai-api-key"))
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # Stream the model's response
 for chunk in model.stream([HumanMessage(content="Tell me a joke about cats that has at least 5 sentences.")]):
@@ -270,8 +270,8 @@ from langchain_openai import ChatOpenAI
 
 # Initialize the chat model
 # model = ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=user_secrets.get_secret("my-openai-api-key"))
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # Simulate a tool call request from the model
 tool_call_message = AIMessage(
@@ -306,8 +306,8 @@ from langchain_openai import ChatOpenAI
 
 # Initialize the chat model
 # model = ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=user_secrets.get_secret("my-openai-api-key"))
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # Simulate a function response
 function_response = FunctionMessage(
@@ -334,8 +334,8 @@ from langchain_openai import ChatOpenAI
 
 # Initialize the chat model
 # model = ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=user_secrets.get_secret("my-openai-api-key"))
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # Create a conversation
 messages = [

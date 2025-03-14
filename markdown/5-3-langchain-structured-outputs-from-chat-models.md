@@ -128,8 +128,8 @@ class Joke(BaseModel):
 # 初始化 ChatOpenAI 模型
 # model = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=user_secrets.get_secret("my-openai-api-key"))
 
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # 配置模型以使用 Pydantic 类返回结构化输出
 structured_llm = model.with_structured_output(Joke)
@@ -160,8 +160,8 @@ class WeatherResponse(BaseModel):
 # 初始化 ChatOpenAI 模型
 # model = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=user_secrets.get_secret("my-openai-api-key"))
 
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # 配置模型以使用 Pydantic 模型输出结构化数据
 structured_model = model.with_structured_output(WeatherResponse)
@@ -201,8 +201,8 @@ class FinalResponse(BaseModel):
 # 初始化 ChatAnthropic 模型
 # model = ChatAnthropic(model="claude-3-5-sonnet-latest", temperature=0, api_key=user_secrets.get_secret("my-anthropic-api-key"))
 
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # 配置模型以使用 Union 模式返回结构化输出
 structured_llm = model.with_structured_output(FinalResponse)
@@ -249,8 +249,8 @@ class Joke(TypedDict):
 # 初始化 ChatOpenAI 模型
 # model = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=user_secrets.get_secret("my-openai-api-key"))
 
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # 配置模型以使用 TypedDict 返回结构化输出
 structured_llm = model.with_structured_output(Joke)
@@ -280,8 +280,8 @@ class ActionResponse(TypedDict):
 
 # 初始化 ChatAnthropic 模型
 # model = ChatAnthropic(model="claude-3-5-sonnet-latest", temperature=0, api_key=user_secrets.get_secret("my-anthropic-api-key"))
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # 配置模型以使用 TypedDict 输出结构化数据
 structured_model = model.with_structured_output(ActionResponse)
@@ -320,8 +320,8 @@ class FinalResponse(TypedDict):
 
 # 初始化 ChatOpenAI 模型
 # model = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=user_secrets.get_secret("my-openai-api-key"))
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # 配置模型以使用 Union 模式返回结构化输出
 structured_llm = model.with_structured_output(FinalResponse)
@@ -374,8 +374,8 @@ json_schema = {
 
 # 初始化 ChatAnthropic 模型
 # model = ChatAnthropic(model="claude-3-5-sonnet-latest", temperature=0, api_key=user_secrets.get_secret("my-anthropic-api-key"))
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # 配置模型以使用 JSON Schema 返回结构化输出
 structured_llm = model.with_structured_output(json_schema)
@@ -436,8 +436,8 @@ final_schema = {
 # 初始化 ChatAnthropic 模型
 # model = ChatAnthropic(model="claude-3-5-sonnet-latest", temperature=0, api_key=user_secrets.get_secret("my-anthropic-api-key"))
 
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # 配置模型以使用 JSON Schema 返回结构化输出
 structured_llm = model.with_structured_output(final_schema)
@@ -479,8 +479,8 @@ class FinalResponse(BaseModel):
 
 # 初始化 ChatOpenAI 模型
 # model = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=user_secrets.get_secret("my-openai-api-key"))
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # 配置模型以使用 Union 模式返回结构化输出
 structured_llm = model.with_structured_output(FinalResponse)
@@ -510,8 +510,8 @@ class Joke(TypedDict):
 
 # 初始化 ChatAnthropic 模型
 # model = ChatAnthropic(model="claude-3-5-sonnet-latest", temperature=0, api_key=user_secrets.get_secret("my-anthropic-api-key"))
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # 配置模型以使用 TypedDict 返回结构化输出
 structured_llm = model.with_structured_output(Joke)
@@ -549,8 +549,8 @@ prompt = ChatPromptTemplate.from_messages([("system", system), ("human", "{input
 # 初始化 ChatOpenAI 模型
 # model = ChatOpenAI(model="gpt-4o-mini", temperature=0, api_key=user_secrets.get_secret("my-openai-api-key"))
 
-model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+model = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # 配置模型以返回结构化输出
 structured_llm = model.with_structured_output(Joke)

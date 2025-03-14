@@ -49,7 +49,7 @@ my_api_key = user_secrets.get_secret("api-key-openai")
 embed = OpenAIEmbeddings(model="text-embedding-3-small", api_key=my_api_key)
 
 # 示例替代配置
-embed = OpenAIEmbeddings(model="text-embedding-3-large", base_url="http://20.243.34.136:2999/v1",
+embed = OpenAIEmbeddings(model="text-embedding-3-large", base_url="请输入地址",
                         api_key="sk-RapHwqOGWbKT68V1531b7011388549F3Bb4316EcF8Ac28De")
 ```
 

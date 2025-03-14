@@ -144,8 +144,8 @@ user_secrets = UserSecretsClient()
 # OpenAI
 # llm = ChatOpenAI(temperature=0, model="gpt-4o", api_key=user_secrets.get_secret("my-openai-api-key"))
 
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="http://20.243.34.136:2999/v1",
-                        openai_api_key="sk-j8r3Pxztstd3wBjF8fEe44E63f69486bAdC2C4562bD1E1F3")
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, base_url="请输入地址",
+                        openai_api_key="请输入密钥")
 
 # DeepSeek-V3
 #llm = ChatOpenAI(temperature=0, model="deepseek-chat", api_key=user_secrets.get_secret("my-deepseek-api-key"),
